@@ -3,10 +3,9 @@
  * Pretty PHP Info — Standalone Script
  *
  * Usage:
- *   curl -sS https://prettyphpinfo.com/go | php > phpinfo.html && open phpinfo.html
+ *   curl -sSL prettyphpinfo.com/go | php > phpinfo.html && open phpinfo.html
  *
- * This script captures phpinfo() locally (excluding environment variables
- * and PHP variables for security), parses it into a structured format,
+ * This script captures phpinfo() locally, parses it into a structured format,
  * and outputs a complete self-contained HTML page. Nothing leaves your machine.
  *
  * @see https://github.com/stechstudio/phpinfo

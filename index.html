@@ -225,7 +225,7 @@
             <h3 class="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">Just want to try it?</h3>
             <p class="text-slate-500 text-xs sm:text-sm mb-5 max-w-lg mx-auto leading-relaxed">No install required. This downloads a small PHP script, runs it locally, and saves the output as an HTML file. Your phpinfo data never leaves your machine.</p>
             <div class="font-mono text-xs sm:text-sm bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-400 inline-block">
-                curl -sS prettyphpinfo.com/go | php > phpinfo.html
+                curl -sSL prettyphpinfo.com/go | php > phpinfo.html && open phpinfo.html
             </div>
         </div>
     </section>
