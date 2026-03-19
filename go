@@ -3,7 +3,7 @@
  * Pretty PHP Info — Standalone Script
  *
  * Usage:
- *   curl -sSL prettyphpinfo.com/go | php > phpinfo.html && open phpinfo.html
+ *   curl -sSL prettyphpinfo.com/go | php
  *
  * This script captures phpinfo() locally, parses it into a structured format,
  * and outputs a complete self-contained HTML page. Nothing leaves your machine.
@@ -218,6 +218,7 @@ function pp_parseGroup(array &$lines, int &$i, int $len): ?array {
 $info = pp_parse($raw);
 
 // ── Output complete HTML page ─────────────────────────────────────────
+ob_start();
 ?>
 <!doctype html>
 <html :class="darkMode && 'dark'" x-data="{ darkMode: localStorage.getItem('phpinfo-dark') === 'true' || (!localStorage.getItem('phpinfo-dark') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" class="dark:[color-scheme:dark]">
@@ -519,3 +520,25 @@ ${r?'Expression: "'+r+`"
 </script>
 </body>
 </html>
+<?php
+$html = ob_get_clean();
+
+if (!stream_isatty(STDOUT)) {
+    echo $html;
+    exit;
+}
+
+$file = getcwd() . '/phpinfo.html';
+file_put_contents($file, $html);
+
+$opened = match (PHP_OS_FAMILY) {
+    'Darwin' => !exec('open ' . escapeshellarg($file)),
+    'Linux' => !exec('xdg-open ' . escapeshellarg($file) . ' 2>/dev/null &'),
+    'Windows' => !exec('start "" ' . escapeshellarg($file)),
+    default => false,
+};
+
+fwrite(STDERR, $opened
+    ? "Saved to phpinfo.html and opened in your browser.\n"
+    : "Saved to phpinfo.html\n"
+);
