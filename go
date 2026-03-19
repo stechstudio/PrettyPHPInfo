@@ -74,6 +74,7 @@ function pp_parse(string $raw): array {
         $line = $current();
         if ($line === null) break;
         if ($isDivider()) { $advance(); continue; }
+        if ($line === 'PHP Credits' || $line === 'PHP License') break;
 
         // Module name detection: no " => ", next line is blank, short text
         if (!$hasItems() && strlen($line) < 80 && ($i + 1 >= $len || $lines[$i + 1] === '')) {
@@ -84,6 +85,13 @@ function pp_parse(string $raw): array {
             break;
         }
     }
+
+    // Credits and License
+    pp_parseCredits($modules, $lines, $i, $len);
+    pp_parseLicense($modules, $lines, $i, $len);
+
+    // Filter out empty modules (e.g. "Module Name" under Additional Modules)
+    $modules = array_values(array_filter($modules, fn($m) => !empty($m['groups'])));
 
     return ['version' => $version, 'modules' => $modules];
 }
@@ -190,6 +198,18 @@ function pp_parseGroup(array &$lines, int &$i, int $len): ?array {
             $localValue .= "\n" . $lines[$i];
         }
 
+        // Multi-line Array dumps (e.g. $_SERVER['argv'] => Array\n(\n...\n))
+        if ($localValue !== null && $localValue === 'Array') {
+            $i++;
+            while ($i < $len && trim($lines[$i]) !== ')') {
+                $localValue .= "\n" . $lines[$i];
+                $i++;
+            }
+            if ($i < $len) {
+                $localValue .= "\n" . $lines[$i];
+            }
+        }
+
         $configs[] = [
             'key' => $configName === 'Names'
                 ? 'config_names_' . md5($localValue ?? '')
@@ -213,6 +233,132 @@ function pp_parseGroup(array &$lines, int &$i, int $len): ?array {
         'configs' => $configs,
         'note' => $note,
     ];
+}
+
+function pp_parseCredits(array &$modules, array &$lines, int &$i, int $len): void {
+    if ($i >= $len || $lines[$i] !== 'PHP Credits') return;
+
+    $i++; // skip "PHP Credits"
+    while ($i < $len && $lines[$i] === '') $i++;
+
+    $groups = [];
+
+    while ($i < $len) {
+        $line = $lines[$i];
+        if ($line === '' && ($i + 1 >= $len || $lines[$i + 1] === 'PHP License' || str_contains($lines[$i + 1] ?? '', '____'))) break;
+        if ($line === 'PHP License' || str_contains($line, '_______________________________________________________________________')) break;
+
+        // Centered title (padded with spaces)
+        if (str_contains($line, '                     ')) {
+            $groupName = trim($line);
+            $i++;
+            while ($i < $len && $lines[$i] === '') $i++;
+
+            // Table heading?
+            $headings = [];
+            $shortHeadings = [];
+            $firstWord = explode(' => ', $lines[$i] ?? '')[0] ?? '';
+            if (in_array($firstWord, ['Contribution', 'Module', 'Authors'])) {
+                $headings = explode(' => ', $lines[$i]);
+                $shortHeadings = array_map(fn($h) => trim(str_replace('Value', '', $h)), $headings);
+                $i++;
+                while ($i < $len && $lines[$i] === '') $i++;
+            }
+
+            // Config rows
+            $configs = [];
+            while ($i < $len && $lines[$i] !== '' && !str_contains($lines[$i], '______')) {
+                if (str_contains($lines[$i], ' => ')) {
+                    $parts = explode(' => ', $lines[$i]);
+                    $configs[] = [
+                        'key' => 'config_' . pp_slug($parts[0]),
+                        'name' => $parts[0],
+                        'hasMasterValue' => false,
+                        'localValue' => $parts[1] ?? null,
+                        'masterValue' => null,
+                    ];
+                } else {
+                    break;
+                }
+                $i++;
+            }
+            while ($i < $len && $lines[$i] === '') $i++;
+
+            if (!empty($configs)) {
+                $groups[] = [
+                    'key' => 'group_' . pp_slug($groupName),
+                    'name' => $groupName,
+                    'headings' => $headings,
+                    'shortHeadings' => $shortHeadings,
+                    'configs' => $configs,
+                    'note' => null,
+                ];
+            }
+        }
+        // Simple title + value pair (e.g. "PHP Group" followed by names)
+        elseif (!str_contains($line, ' => ') && strlen($line) < 80) {
+            $groupName = $line;
+            $i++;
+            while ($i < $len && $lines[$i] === '') $i++;
+            $value = ($i < $len && $lines[$i] !== '' && !str_contains($lines[$i], '______')) ? $lines[$i] : null;
+            if ($value !== null) $i++;
+            while ($i < $len && $lines[$i] === '') $i++;
+
+            $groups[] = [
+                'key' => 'group_' . pp_slug($groupName),
+                'name' => $groupName,
+                'headings' => [],
+                'shortHeadings' => [],
+                'configs' => $value ? [[
+                    'key' => 'config_names_' . md5($value),
+                    'name' => 'Names',
+                    'hasMasterValue' => false,
+                    'localValue' => $value,
+                    'masterValue' => null,
+                ]] : [],
+                'note' => null,
+            ];
+        } else {
+            break;
+        }
+    }
+
+    if (!empty($groups)) {
+        $modules[] = [
+            'key' => 'module_' . pp_slug('PHP Credits'),
+            'name' => 'PHP Credits',
+            'groups' => $groups,
+        ];
+    }
+}
+
+function pp_parseLicense(array &$modules, array &$lines, int &$i, int $len): void {
+    if ($i >= $len || $lines[$i] !== 'PHP License') return;
+
+    $i++; // skip "PHP License"
+    while ($i < $len && $lines[$i] === '') $i++;
+
+    $text = [];
+    while ($i < $len) {
+        $text[] = $lines[$i];
+        $i++;
+    }
+
+    $note = trim(implode("\n", $text));
+    if ($note !== '') {
+        $modules[] = [
+            'key' => 'module_' . pp_slug('PHP License'),
+            'name' => 'PHP License',
+            'groups' => [[
+                'key' => 'group_license',
+                'name' => null,
+                'headings' => [],
+                'shortHeadings' => [],
+                'configs' => [],
+                'note' => $note,
+            ]],
+        ];
+    }
 }
 
 $info = pp_parse($raw);
