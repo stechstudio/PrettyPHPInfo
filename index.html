@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en" x-data="{ dark: window.matchMedia('(prefers-color-scheme: dark)').matches }" :class="dark && 'dark'">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pretty PHP Info - A modern phpinfo() for humans</title>
+    <meta name="description" content="A beautiful, searchable replacement for phpinfo(). Query PHP configuration programmatically or browse it in a modern dark-mode UI.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f50d;</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'ui-monospace', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        .code-block { background: #0d1117; overflow-x: auto; }
+        .code-block .keyword { color: #ff7b72; }
+        .code-block .string { color: #a5d6ff; }
+        .code-block .function { color: #d2a8ff; }
+        .code-block .variable { color: #ffa657; }
+        .code-block .comment { color: #8b949e; }
+        .code-block .number { color: #79c0ff; }
+        .code-block .operator { color: #ff7b72; }
+        .code-block .class { color: #7ee787; }
+        .code-block div { white-space: nowrap; }
+        [x-cloak] { display: none !important; }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+</head>
+<body class="bg-white dark:bg-[#09090b] text-slate-600 dark:text-slate-300 antialiased overflow-x-hidden">
+
+    <!-- Nav -->
+    <nav class="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-lg">
+        <div class="max-w-6xl mx-auto px-3 sm:px-6 h-12 sm:h-16 flex items-center justify-between min-w-0">
+            <span class="text-slate-900 dark:text-white font-light text-base sm:text-xl tracking-tight shrink-0">Pretty PHP Info</span>
+            <div class="flex items-center gap-4 sm:gap-6 shrink-0">
+                <a href="https://github.com/stechstudio/phpinfo" class="hidden sm:inline text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">GitHub</a>
+                <a href="https://packagist.org/packages/stechstudio/phpinfo" class="hidden sm:inline text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Packagist</a>
+                <button @click="dark = !dark; document.documentElement.classList.toggle('dark', dark)" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors" title="Toggle theme">
+                    <svg x-show="dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
+                    <svg x-cloak x-show="!dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+                </button>
+                <a href="https://github.com/stechstudio/phpinfo" class="text-xs sm:text-sm font-medium text-slate-700 dark:text-white bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 px-3 sm:px-4 py-1.5 rounded-lg transition-colors whitespace-nowrap">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="pt-28 sm:pt-40 pb-8 px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 rounded-full px-3 sm:px-4 py-1.5 mb-6 sm:mb-8">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>PHP 8.3+ &middot; <span class="hidden sm:inline">Works with </span>any framework or plain PHP</span>
+            </div>
+            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-slate-900 dark:text-white leading-[1.1] mb-5 sm:mb-6">
+                A prettier<br><span class="text-indigo-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-indigo-400 dark:to-cyan-400">phpinfo()</span>
+            </h1>
+            <p class="text-base sm:text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+                Parse, query, and display your PHP configuration with a clean API and a modern, searchable interface. Drop-in replacement for the default phpinfo() page.
+            </p>
+            <div class="flex justify-center mb-4">
+                <div class="font-mono text-xs sm:text-sm bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-4 sm:px-5 py-3 text-slate-700 dark:text-slate-300">
+                    composer require <span class="text-indigo-600 dark:text-cyan-400">stechstudio/phpinfo</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshot -->
+    <section class="px-4 sm:px-6 pb-16 sm:pb-24">
+        <div class="max-w-5xl mx-auto">
+            <div class="rounded-lg sm:rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-none dark:drop-shadow-[0_0_80px_rgba(99,102,241,0.15)]">
+                <img x-show="dark" src="screenshot-dark.png" alt="Pretty PHP Info dark mode interface" class="w-full">
+                <img x-cloak x-show="!dark" src="screenshot-light.png" alt="Pretty PHP Info light mode interface" class="w-full">
+            </div>
+        </div>
+    </section>
+
+    <!-- Two-column features -->
+    <section class="px-4 sm:px-6 pb-16 sm:pb-24">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-10 sm:mb-16">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-3 sm:mb-4">Two ways to use it</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-base sm:text-lg">A beautiful browser UI and a powerful programmatic API. Same package.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
+                <!-- Browser UI -->
+                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl p-5 sm:p-8 min-w-0">
+                    <div class="text-xs font-medium uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-2 sm:mb-3">Browser</div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3">Drop-in phpinfo() replacement</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-5 sm:mb-6">
+                        One line of code gives you a searchable, responsive, dark-mode-ready interface. Sidebar navigation, keyboard shortcuts, click-to-copy values. Zero external requests &mdash; everything is self-contained.
+                    </p>
+                    <div class="code-block rounded-lg p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                        <div><span class="comment">// Replace your phpinfo() call</span></div>
+                        <div class="mt-1"><span class="function">prettyphpinfo</span>();</div>
+                        <div class="mt-3"><span class="comment">// Or exclude env vars for security</span></div>
+                        <div><span class="function">prettyphpinfo</span>(<span class="variable">INFO_MODULES</span>);</div>
+                    </div>
+                </div>
+
+                <!-- Programmatic API -->
+                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl p-5 sm:p-8 min-w-0">
+                    <div class="text-xs font-medium uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2 sm:mb-3">Programmatic</div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3">Query anything in your PHP config</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-5 sm:mb-6">
+                        Structured data model built on Laravel Collections. Look up modules, configs, directives &mdash; with local and master values. Parse saved phpinfo output from any source.
+                    </p>
+                    <div class="code-block rounded-lg p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                        <div><span class="variable">$info</span> = <span class="class">Info</span><span class="operator">::</span><span class="function">capture</span>();</div>
+                        <div class="mt-2"><span class="variable">$info</span><span class="operator">-></span><span class="function">version</span>();        <span class="comment">// "8.5.4"</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">hasModule</span>(<span class="string">'curl'</span>); <span class="comment">// true</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">config</span>(<span class="string">'memory_limit'</span>); <span class="comment">// "128M"</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code examples -->
+    <section class="px-4 sm:px-6 pb-16 sm:pb-24">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-10 sm:mb-16">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-3 sm:mb-4">Clean, expressive API</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-base sm:text-lg">Everything you need to inspect PHP configuration, nothing you don't.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
+                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0">
+                    <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-slate-500">Check modules and configs</div>
+                    <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                        <div><span class="variable">$info</span> = <span class="class">Info</span><span class="operator">::</span><span class="function">capture</span>();</div>
+                        <div class="mt-3"><span class="comment">// Check for extensions</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">hasModule</span>(<span class="string">'redis'</span>); <span class="comment">// true</span></div>
+                        <div class="mt-3"><span class="comment">// Get any config value</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">config</span>(<span class="string">'max_file_uploads'</span>); <span class="comment">// "20"</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">config</span>(<span class="string">'max_file_uploads'</span>, <span class="string">'master'</span>); <span class="comment">// "100"</span></div>
+                        <div class="mt-3"><span class="comment">// Convenience methods</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">os</span>();       <span class="comment">// "Linux"</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">hostname</span>(); <span class="comment">// "web-01"</span></div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0">
+                    <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-slate-500">Iterate with Laravel Collections</div>
+                    <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                        <div><span class="comment">// All modules as a Collection</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">modules</span>()<span class="operator">-></span><span class="function">each</span>(<span class="keyword">function</span>(<span class="variable">$module</span>) {</div>
+                        <div>&nbsp;&nbsp;<span class="variable">$module</span><span class="operator">-></span><span class="function">name</span>();</div>
+                        <div>&nbsp;&nbsp;<span class="variable">$module</span><span class="operator">-></span><span class="function">configs</span>()<span class="operator">-></span><span class="function">count</span>();</div>
+                        <div>});</div>
+                        <div class="mt-3"><span class="comment">// Flatten all configs across all modules</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">configs</span>()<span class="operator">-></span><span class="function">where</span>(...)</div>
+                        <div class="mt-3"><span class="comment">// Parse saved output from any source</span></div>
+                        <div><span class="class">Info</span><span class="operator">::</span><span class="function">fromHtml</span>(<span class="variable">$saved</span>);</div>
+                        <div><span class="class">Info</span><span class="operator">::</span><span class="function">fromText</span>(<span class="variable">$cliOutput</span>);</div>
+                        <div><span class="class">Info</span><span class="operator">::</span><span class="function">detect</span>(<span class="variable">$anything</span>);</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features grid -->
+    <section class="px-4 sm:px-6 pb-16 sm:pb-24">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                    <div class="text-slate-900 dark:text-white font-medium text-sm sm:text-base mb-1 sm:mb-2">Instant search</div>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">Filter across all modules and configs as you type. Press <kbd class="text-xs border border-slate-300 dark:border-white/10 rounded px-1 py-0.5 text-slate-500 dark:text-slate-400">/</kbd> to focus.</p>
+                </div>
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                    <div class="text-slate-900 dark:text-white font-medium text-sm sm:text-base mb-1 sm:mb-2">Dark mode</div>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">Follows system preference with a manual toggle. Persists your choice across sessions.</p>
+                </div>
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                    <div class="text-slate-900 dark:text-white font-medium text-sm sm:text-base mb-1 sm:mb-2">Click to copy</div>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">Hover any config value to reveal a copy button. Works on HTTP and HTTPS.</p>
+                </div>
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                    <div class="text-slate-900 dark:text-white font-medium text-sm sm:text-base mb-1 sm:mb-2">Deep linking</div>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">Every module, group, and config has a unique URL hash. Link directly to any directive.</p>
+                </div>
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                    <div class="text-slate-900 dark:text-white font-medium text-sm sm:text-base mb-1 sm:mb-2">Self-contained</div>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">All CSS and JS are inlined. No CDN requests, no external dependencies. Works air-gapped.</p>
+                </div>
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                    <div class="text-slate-900 dark:text-white font-medium text-sm sm:text-base mb-1 sm:mb-2">Dual parser</div>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">Parses both HTML (web) and plaintext (CLI) phpinfo() output. Auto-detects the format.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="px-4 sm:px-6 pb-20 sm:pb-32">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-3 sm:mb-4">Get started in seconds</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base mb-6 sm:mb-8">Install with Composer, call one function. That's it.</p>
+            <div class="code-block rounded-lg border border-slate-200 dark:border-white/10 p-4 sm:p-5 font-mono text-xs sm:text-sm text-left max-w-lg mx-auto leading-relaxed">
+                <div><span class="comment">// 1. Install</span></div>
+                <div class="text-slate-400">$ composer require stechstudio/phpinfo</div>
+                <div class="mt-4"><span class="comment">// 2. Use</span></div>
+                <div><span class="keyword">require</span> <span class="string">'vendor/autoload.php'</span>;</div>
+                <div><span class="function">prettyphpinfo</span>();</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Try without installing -->
+    <section class="px-4 sm:px-6 pb-20 sm:pb-24">
+        <div class="max-w-2xl mx-auto text-center">
+            <h3 class="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white tracking-tight mb-2">Just want to try it?</h3>
+            <p class="text-slate-500 text-xs sm:text-sm mb-5 max-w-lg mx-auto leading-relaxed">No install required. This downloads a small PHP script, runs it locally, and saves the output as an HTML file. Your phpinfo data never leaves your machine.</p>
+            <div class="font-mono text-xs sm:text-sm bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-400 inline-block">
+                curl -sS prettyphpinfo.com/go | php > phpinfo.html
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-white/5 py-6 sm:py-8 px-4 sm:px-6">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs sm:text-sm text-slate-400 dark:text-slate-600">
+            <div>Built by <a href="https://stechstudio.com" class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Signature Tech Studio</a></div>
+            <div class="flex gap-6">
+                <a href="https://github.com/stechstudio/phpinfo" class="hover:text-slate-600 dark:hover:text-slate-400 transition-colors">GitHub</a>
+                <a href="https://packagist.org/packages/stechstudio/phpinfo" class="hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Packagist</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
