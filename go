@@ -17,7 +17,16 @@ ob_start();
 phpinfo();
 $raw = ob_get_clean();
 
-// ── Minimal text parser (no dependencies) ─────────────────────────────
+// ── Text parser (shared with package) ─────────────────────────────────
+/**
+ * Plain-PHP text parser for phpinfo() CLI output.
+ *
+ * This file is the single source of truth for text parsing. It is used by:
+ *   - The package's TextParser class (via require)
+ *   - The standalone script dist/go-standalone.php (inlined by build-go.php)
+ *
+ * No classes, no namespaces, no dependencies — just functions returning arrays.
+ */
 
 function pp_slug(string $text): string {
     return strtolower(trim(preg_replace('/\W+/', '_', $text), '_'));
@@ -360,6 +369,7 @@ function pp_parseLicense(array &$modules, array &$lines, int &$i, int $len): voi
         ];
     }
 }
+
 
 $info = pp_parse($raw);
 
