@@ -138,7 +138,7 @@
                     <div class="text-xs font-medium uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2 sm:mb-3">Programmatic</div>
                     <h3 class="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3">Query anything in your PHP config</h3>
                     <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-5 sm:mb-6">
-                        Structured data model built on Laravel Collections. Look up modules, configs, directives &mdash; with local and master values. Parse saved phpinfo output from any source.
+                        Structured data model with a fluent, iterable API. Look up modules, configs, directives &mdash; with local and master values. Parse saved phpinfo output from any source.
                     </p>
                     <div class="code-block rounded-lg p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
                         <div><span class="variable">$info</span> = <span class="class">Info</span><span class="operator">::</span><span class="function">capture</span>();</div>
@@ -169,6 +169,8 @@
                         <div class="mt-3"><span class="comment">// Get any config value</span></div>
                         <div><span class="variable">$info</span><span class="operator">-></span><span class="function">config</span>(<span class="string">'max_file_uploads'</span>); <span class="comment">// "20"</span></div>
                         <div><span class="variable">$info</span><span class="operator">-></span><span class="function">config</span>(<span class="string">'max_file_uploads'</span>, <span class="string">'master'</span>); <span class="comment">// "100"</span></div>
+                        <div class="mt-3"><span class="comment">// Dig into a specific module</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">module</span>(<span class="string">'curl'</span>)<span class="operator">-></span><span class="function">config</span>(<span class="string">'version'</span>); <span class="comment">// "8.7.1"</span></div>
                         <div class="mt-3"><span class="comment">// Convenience methods</span></div>
                         <div><span class="variable">$info</span><span class="operator">-></span><span class="function">os</span>();       <span class="comment">// "Linux"</span></div>
                         <div><span class="variable">$info</span><span class="operator">-></span><span class="function">hostname</span>(); <span class="comment">// "web-01"</span></div>
@@ -176,15 +178,16 @@
                 </div>
 
                 <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0">
-                    <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-slate-500">Iterate with Laravel Collections</div>
+                    <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-slate-500">Iterate and explore</div>
                     <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
-                        <div><span class="comment">// All modules as a Collection</span></div>
+                        <div><span class="comment">// Iterate all modules</span></div>
                         <div><span class="variable">$info</span><span class="operator">-></span><span class="function">modules</span>()<span class="operator">-></span><span class="function">each</span>(<span class="keyword">function</span>(<span class="variable">$module</span>) {</div>
                         <div>&nbsp;&nbsp;<span class="variable">$module</span><span class="operator">-></span><span class="function">name</span>();</div>
                         <div>&nbsp;&nbsp;<span class="variable">$module</span><span class="operator">-></span><span class="function">configs</span>()<span class="operator">-></span><span class="function">count</span>();</div>
                         <div>});</div>
-                        <div class="mt-3"><span class="comment">// Flatten all configs across all modules</span></div>
-                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">configs</span>()<span class="operator">-></span><span class="function">where</span>(...)</div>
+                        <div class="mt-3"><span class="comment">// Flatten all configs across modules</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">configs</span>()<span class="operator">-></span><span class="function">count</span>(); <span class="comment">// 342</span></div>
+                        <div><span class="variable">$info</span><span class="operator">-></span><span class="function">configs</span>()<span class="operator">-></span><span class="function">filter</span>(<span class="keyword">fn</span>(<span class="variable">$c</span>) <span class="operator">=></span> ...);</div>
                         <div class="mt-3"><span class="comment">// Parse saved output from any source</span></div>
                         <div><span class="class">Info</span><span class="operator">::</span><span class="function">fromHtml</span>(<span class="variable">$saved</span>);</div>
                         <div><span class="class">Info</span><span class="operator">::</span><span class="function">fromText</span>(<span class="variable">$cliOutput</span>);</div>
