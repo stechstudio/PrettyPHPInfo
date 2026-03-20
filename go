@@ -1,4 +1,885 @@
 <?php
+namespace STS\Phpinfo\Support {
+final class Str
+{
+    public static function slug(string $text): string
+    {
+        return strtolower(trim(preg_replace('/\W+/', '_', $text), '_'));
+    }
+}
+}
+
+namespace STS\Phpinfo\Support {
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
+use JsonSerializable;
+
+class Items implements Countable, IteratorAggregate, JsonSerializable
+{
+    protected array $items;
+
+    public function __construct(iterable $items = [])
+    {
+        $this->items = is_array($items) ? $items : iterator_to_array($items, false);
+    }
+
+    public function push(mixed $item): static
+    {
+        $this->items[] = $item;
+
+        return $this;
+    }
+
+    public function prepend(mixed $item): static
+    {
+        array_unshift($this->items, $item);
+
+        return $this;
+    }
+
+    public function first(?callable $callback = null): mixed
+    {
+        if ($callback === null) {
+            return $this->items[0] ?? null;
+        }
+
+        foreach ($this->items as $item) {
+            if ($callback($item)) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    public function last(?callable $callback = null): mixed
+    {
+        if ($callback === null) {
+            return $this->items ? end($this->items) : null;
+        }
+
+        $result = null;
+        foreach ($this->items as $item) {
+            if ($callback($item)) {
+                $result = $item;
+            }
+        }
+
+        return $result;
+    }
+
+    public function get(int $index): mixed
+    {
+        return $this->items[$index] ?? null;
+    }
+
+    public function map(callable $callback): static
+    {
+        return new static(array_map($callback, $this->items));
+    }
+
+    public function flatMap(callable $callback): static
+    {
+        $result = [];
+
+        foreach ($this->items as $item) {
+            $values = $callback($item);
+            foreach ($values as $value) {
+                $result[] = $value;
+            }
+        }
+
+        return new static($result);
+    }
+
+    public function filter(?callable $callback = null): static
+    {
+        return new static(array_values(
+            $callback ? array_filter($this->items, $callback) : array_filter($this->items)
+        ));
+    }
+
+    public function reject(callable $callback): static
+    {
+        return $this->filter(fn($item) => !$callback($item));
+    }
+
+    public function each(callable $callback): static
+    {
+        foreach ($this->items as $key => $item) {
+            $callback($item, $key);
+        }
+
+        return $this;
+    }
+
+    public function implode(string $glue): string
+    {
+        return implode($glue, $this->items);
+    }
+
+    public function skip(int $count): static
+    {
+        return new static(array_slice($this->items, $count));
+    }
+
+    public function unique(): static
+    {
+        return new static(array_values(array_unique($this->items)));
+    }
+
+    public function values(): static
+    {
+        return new static(array_values($this->items));
+    }
+
+    public function all(): array
+    {
+        return $this->items;
+    }
+
+    public function toArray(): array
+    {
+        return $this->items;
+    }
+
+    public function contains(mixed $callback): bool
+    {
+        if (is_callable($callback)) {
+            return $this->first($callback) !== null;
+        }
+
+        return in_array($callback, $this->items, true);
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->items);
+    }
+
+    public function isNotEmpty(): bool
+    {
+        return !$this->isEmpty();
+    }
+
+    public function count(): int
+    {
+        return count($this->items);
+    }
+
+    public function getIterator(): ArrayIterator
+    {
+        return new ArrayIterator($this->items);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return array_values(array_map(
+            fn($item) => $item instanceof JsonSerializable ? $item->jsonSerialize() : $item,
+            $this->items
+        ));
+    }
+}
+}
+
+namespace STS\Phpinfo\Models {
+use JsonSerializable;
+use STS\Phpinfo\Support\Str;
+
+class Config implements JsonSerializable
+{
+    public function __construct(
+        protected string $name,
+        protected ?string $localValue = null,
+        protected ?string $masterValue = null,
+        protected bool $hasMasterValue = false,
+    ) {}
+
+    public static function fromValues(array $values): static
+    {
+        $hasThreeColumns = count($values) >= 3;
+
+        return new static(
+            name: $values[0],
+            localValue: ($values[1] ?? null) === 'no value' ? null : ($values[1] ?? null),
+            masterValue: $hasThreeColumns ? (($values[2] ?? null) === 'no value' ? null : ($values[2] ?? null)) : null,
+            hasMasterValue: $hasThreeColumns,
+        );
+    }
+
+    public function key(): string
+    {
+        return $this->name === 'Names'
+            ? 'config_names_' . md5((string) $this->localValue())
+            : 'config_' . Str::slug($this->name);
+    }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function value(string $which = 'local'): ?string
+    {
+        return match ($which) {
+            'local' => $this->localValue(),
+            'master' => $this->masterValue(),
+            default => throw new \InvalidArgumentException("Invalid value type '{$which}'. Expected 'local' or 'master'."),
+        };
+    }
+
+    public function localValue(): ?string
+    {
+        return $this->localValue;
+    }
+
+    public function hasMasterValue(): bool
+    {
+        return $this->hasMasterValue;
+    }
+
+    public function masterValue(): ?string
+    {
+        return $this->hasMasterValue ? $this->masterValue : null;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->value();
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'key' => $this->key(),
+            'name' => $this->name(),
+            'hasMasterValue' => $this->hasMasterValue(),
+            'localValue' => $this->localValue() ?? 'no value',
+            'masterValue' => $this->hasMasterValue() ? ($this->masterValue() ?? 'no value') : null,
+        ];
+    }
+}
+}
+
+namespace STS\Phpinfo\Models {
+use JsonSerializable;
+use STS\Phpinfo\Support\Items;
+use STS\Phpinfo\Support\Str;
+
+class Group implements JsonSerializable
+{
+    public function __construct(
+        protected Items $configs,
+        protected ?Items $headings = null,
+        protected ?string $name = null,
+        protected ?string $note = null,
+    ) {}
+
+    public static function simple(string $name, string $configName, string $contents): static
+    {
+        return new static(
+            items([new Config($configName, $contents)]),
+            name: $name,
+        );
+    }
+
+    public static function noteOnly(string $note): static
+    {
+        return (new static(items()))->addNote($note);
+    }
+
+    public function addNote(string $note): self
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
+    public function key(): string
+    {
+        return $this->name
+            ? 'group_' . Str::slug($this->name)
+            : 'group_' . md5($this->configs()->map(fn($c) => $c->name())->implode(','));
+    }
+
+    public function name(): ?string
+    {
+        return $this->name;
+    }
+
+    public function note(): ?string
+    {
+        return $this->note;
+    }
+
+    public function configs(): Items
+    {
+        return $this->configs;
+    }
+
+    public function hasHeadings(): bool
+    {
+        return $this->headings !== null && $this->headings->count() > 0;
+    }
+
+    public function headings(): Items
+    {
+        return $this->hasHeadings() ? $this->headings : items();
+    }
+
+    public function heading(int $index): ?string
+    {
+        return $this->headings()?->get($index);
+    }
+
+    public function shortHeading(int $index): ?string
+    {
+        return $this->shorten($this->headings()?->get($index));
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'key' => $this->key(),
+            'name' => $this->name(),
+            'headings' => $this->headings(),
+            'shortHeadings' => $this->headings()->map(fn($heading) => $this->shorten($heading)),
+            'configs' => $this->configs()->values(),
+            'note' => $this->note(),
+        ];
+    }
+
+    protected function shorten(?string $heading): ?string
+    {
+        if ($heading === null) {
+            return null;
+        }
+
+        return trim(str_replace('Value', '', $heading));
+    }
+}
+}
+
+namespace STS\Phpinfo\Models {
+use JsonSerializable;
+use STS\Phpinfo\Support\Items;
+use STS\Phpinfo\Support\Str;
+
+class Module implements JsonSerializable
+{
+    public function __construct(
+        protected string $name,
+        protected Items $groups,
+    ) {}
+
+    public function key(): string
+    {
+        return 'module_' . Str::slug($this->name);
+    }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function groups(): Items
+    {
+        return $this->groups;
+    }
+
+    public function configs(): Items
+    {
+        return $this->groups()->flatMap(fn(Group $g) => $g->configs());
+    }
+
+    public function hasConfig(string $name): bool
+    {
+        return $this->findConfig($name) !== null;
+    }
+
+    public function config(string $name, string $which = 'local'): ?string
+    {
+        return $this->findConfig($name)?->value($which);
+    }
+
+    public function combinedKeyFor(Config $config): string
+    {
+        return $this->key() . '_' . $config->key();
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'key' => $this->key(),
+            'name' => $this->name(),
+            'groups' => $this->groups()->values(),
+        ];
+    }
+
+    public function findConfig(string $name): ?Config
+    {
+        $slug = Str::slug($name);
+
+        return $this->configs()
+            ->first(fn(Config $config) => Str::slug($config->name()) === $slug);
+    }
+}
+}
+
+namespace STS\Phpinfo {
+use JsonSerializable;
+use STS\Phpinfo\Models\Config;
+use STS\Phpinfo\Models\Module;
+use STS\Phpinfo\Support\Items;
+use STS\Phpinfo\Support\Str;
+
+class PhpInfo implements JsonSerializable
+{
+    protected ?Items $flatConfigs = null;
+
+    public function __construct(
+        protected string $version,
+        protected Items $modules,
+    ) {}
+
+    public function version(): string
+    {
+        return $this->version;
+    }
+
+    public function modules(): Items
+    {
+        return $this->modules;
+    }
+
+    public function module(string $name): ?Module
+    {
+        $slug = Str::slug($name);
+
+        return $this->modules()
+            ->first(fn(Module $module) => Str::slug($module->name()) === $slug);
+    }
+
+    public function hasModule(string $name): bool
+    {
+        return $this->module($name) !== null;
+    }
+
+    public function configs(): Items
+    {
+        return $this->flatConfigs ??= $this->modules()->flatMap(fn(Module $m) => $m->configs());
+    }
+
+    public function config(string $name, string $which = 'local'): ?string
+    {
+        return $this->findConfig($name)?->value($which);
+    }
+
+    public function hasConfig(string $name): bool
+    {
+        return $this->findConfig($name) !== null;
+    }
+
+    /**
+     * The operating system name, extracted from the System config.
+     */
+    public function os(): ?string
+    {
+        $system = $this->config('System');
+
+        return $system ? explode(' ', $system)[0] : null;
+    }
+
+    /**
+     * The hostname, extracted from the System config.
+     */
+    public function hostname(): ?string
+    {
+        $system = $this->config('System');
+
+        return $system ? (explode(' ', $system)[1] ?? null) : null;
+    }
+
+    public function render(): void
+    {
+        $info = $this;
+        include __DIR__ . '/../dist/default.php';
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'version' => $this->version(),
+            'modules' => $this->modules()->values(),
+        ];
+    }
+
+    public function findConfig(string $name): ?Config
+    {
+        $slug = Str::slug($name);
+
+        return $this->configs()
+            ->first(fn(Config $config) => Str::slug($config->name()) === $slug);
+    }
+}
+}
+
+namespace STS\Phpinfo\Parsers {
+use STS\Phpinfo\PhpInfo;
+
+interface Parser
+{
+    public static function canParse(string $contents): bool;
+
+    public function parse(): PhpInfo;
+}
+}
+
+namespace STS\Phpinfo\Parsers {
+use InvalidArgumentException;
+use STS\Phpinfo\Models\Config;
+use STS\Phpinfo\Models\Group;
+use STS\Phpinfo\Models\Module;
+use STS\Phpinfo\PhpInfo;
+use STS\Phpinfo\Support\Items;
+
+class TextParser implements Parser
+{
+    protected array $lines;
+    protected int $pos;
+    protected int $len;
+
+    public function __construct(protected string $contents)
+    {
+        if (!static::canParse($contents)) {
+            throw new InvalidArgumentException('Content provided does not appear to be valid phpinfo() text output');
+        }
+    }
+
+    public static function canParse(string $contents): bool
+    {
+        $normalized = str_replace("\r\n", "\n", $contents);
+
+        return str_starts_with($normalized, "phpinfo()\n");
+    }
+
+    public function parse(): PhpInfo
+    {
+        $this->lines = explode("\n", str_replace("\r\n", "\n", $this->contents));
+        $this->pos = 0;
+        $this->len = count($this->lines);
+
+        // Skip "phpinfo()"
+        $this->advance();
+
+        // PHP Version
+        $version = '';
+        if ($this->hasItems() && ($this->items()[0] ?? '') === 'PHP Version') {
+            $version = $this->items()[1] ?? '';
+            $this->advance();
+        }
+
+        $modules = items();
+
+        // General module
+        $general = $this->parseModule('General');
+        if ($general->groups()->isNotEmpty()) {
+            $modules->push($general);
+        }
+
+        // Skip divider
+        if ($this->pos < $this->len && $this->isDivider()) {
+            $this->advance();
+        }
+
+        // Module loop
+        while ($this->pos < $this->len) {
+            $line = $this->current();
+            if ($line === null) break;
+            if ($this->isDivider()) { $this->advance(); continue; }
+            if ($line === 'PHP Credits' || $line === 'PHP License') break;
+
+            // Module name detection: no " => ", next line is blank, short text
+            if (!$this->hasItems() && strlen($line) < 80 && ($this->pos + 1 >= $this->len || $this->lines[$this->pos + 1] === '')) {
+                $moduleName = $line;
+                $this->advance();
+                $modules->push($this->parseModule($moduleName));
+            } else {
+                break;
+            }
+        }
+
+        // Credits and License
+        $this->parseCredits($modules);
+        $this->parseLicense($modules);
+
+        // Filter out empty modules (e.g. "Module Name" under Additional Modules)
+        $modules = $modules->filter(fn(Module $m) => $m->groups()->isNotEmpty());
+
+        return new PhpInfo($version, $modules);
+    }
+
+    private function current(): ?string
+    {
+        return $this->pos < $this->len ? $this->lines[$this->pos] : null;
+    }
+
+    private function advance(): void
+    {
+        do {
+            $this->pos++;
+        } while ($this->pos < $this->len && ($this->lines[$this->pos] === '' || $this->lines[$this->pos] === 'Configuration'));
+    }
+
+    private function isDivider(): bool
+    {
+        return $this->current() !== null && str_contains($this->current(), '_______________________________________________________________________');
+    }
+
+    private function hasItems(): bool
+    {
+        return $this->current() !== null && str_contains($this->current(), ' => ');
+    }
+
+    private function items(): array
+    {
+        return explode(' => ', $this->current() ?? '');
+    }
+
+    private function parseModule(string $name): Module
+    {
+        $groups = items();
+
+        while ($this->pos < $this->len) {
+            $group = $this->parseGroup();
+            if ($group === null) break;
+            $groups->push($group);
+        }
+
+        return new Module($name, $groups);
+    }
+
+    private function parseGroup(): ?Group
+    {
+        if ($this->pos >= $this->len) return null;
+        $line = $this->lines[$this->pos] ?? null;
+        if ($line === null) return null;
+
+        // Stop at dividers or blank-followed-by-short (module names)
+        if (str_contains($line, '_______________________________________________________________________')) return null;
+        if ($line === '') { $this->pos++; return $this->parseGroup(); }
+
+        // Check if this looks like a module name (stop parsing groups)
+        if (!str_contains($line, ' => ') && strlen($line) < 80 && ($this->pos + 1 >= $this->len || $this->lines[$this->pos + 1] === '')) {
+            return null;
+        }
+
+        $groupName = null;
+        $headings = [];
+        $configs = [];
+        $note = null;
+
+        // Group title: no " => ", next line is NOT blank, short text, not a heading keyword
+        if (!str_contains($line, ' => ') && strlen($line) < 80
+            && ($this->pos + 1 < $this->len && $this->lines[$this->pos + 1] !== '')
+            && !in_array($line, ['Directive', 'Variable', 'Contribution', 'Module'])) {
+
+            // But also check it's not a module name
+            if (!str_contains($line, '                     ') && ($this->pos + 1 < $this->len && str_contains($this->lines[$this->pos + 1], ' => ') || in_array($this->lines[$this->pos + 1] ?? '', ['Directive', 'Variable']))) {
+                $groupName = $line;
+                do { $this->pos++; } while ($this->pos < $this->len && $this->lines[$this->pos] === '');
+                $line = $this->lines[$this->pos] ?? null;
+                if ($line === null) return null;
+            }
+        }
+
+        // Table heading
+        $parts = explode(' => ', $line);
+        if (in_array($parts[0], ['Directive', 'Variable', 'Contribution', 'Module'])) {
+            $headings = $parts;
+            do { $this->pos++; } while ($this->pos < $this->len && $this->lines[$this->pos] === '');
+            $line = $this->lines[$this->pos] ?? null;
+        }
+
+        // Determine expected column count
+        $expectedCols = count($headings) ?: null;
+
+        // Parse config rows
+        while ($this->pos < $this->len) {
+            $line = $this->lines[$this->pos];
+            if ($line === '' || str_contains($line, '_______________________________________________________________________')) break;
+
+            if (!str_contains($line, ' => ')) {
+                // Could be a note or end of group
+                if (strlen($line) > 50) {
+                    $noteLines = [];
+                    while ($this->pos < $this->len && $this->lines[$this->pos] !== '' && !str_contains($this->lines[$this->pos], '_____')) {
+                        $noteLines[] = $this->lines[$this->pos];
+                        $this->pos++;
+                    }
+                    $note = trim(implode("\n", $noteLines));
+                    break;
+                }
+                break;
+            }
+
+            $parts = explode(' => ', $line);
+            $configName = $parts[0];
+            $localValue = $parts[1] ?? null;
+            $masterValue = null;
+            $hasMaster = false;
+
+            if ($expectedCols === 3 && count($parts) >= 3) {
+                $masterValue = $parts[2];
+                $hasMaster = true;
+            } elseif ($expectedCols === null && count($parts) >= 3) {
+                $masterValue = $parts[2];
+                $hasMaster = true;
+            }
+
+            // Multi-line values (comma-continued)
+            while ($localValue !== null && str_ends_with($localValue, ',') && $this->pos + 1 < $this->len) {
+                $this->pos++;
+                $localValue .= "\n" . $this->lines[$this->pos];
+            }
+
+            // Multi-line Array dumps (e.g. $_SERVER['argv'] => Array\n(\n...\n))
+            if ($localValue !== null && $localValue === 'Array') {
+                $this->pos++;
+                while ($this->pos < $this->len && trim($this->lines[$this->pos]) !== ')') {
+                    $localValue .= "\n" . $this->lines[$this->pos];
+                    $this->pos++;
+                }
+                if ($this->pos < $this->len) {
+                    $localValue .= "\n" . $this->lines[$this->pos];
+                }
+            }
+
+            $configs[] = new Config(
+                $configName,
+                ($localValue === 'no value') ? null : $localValue,
+                $hasMaster ? (($masterValue === 'no value') ? null : $masterValue) : null,
+                $hasMaster,
+            );
+
+            $this->pos++;
+        }
+
+        if (empty($configs) && $note === null && $groupName === null) return null;
+
+        return new Group(
+            items($configs),
+            !empty($headings) ? items($headings) : null,
+            $groupName,
+            $note,
+        );
+    }
+
+    private function parseCredits(Items $modules): void
+    {
+        if ($this->pos >= $this->len || $this->lines[$this->pos] !== 'PHP Credits') return;
+
+        $this->pos++; // skip "PHP Credits"
+        while ($this->pos < $this->len && $this->lines[$this->pos] === '') $this->pos++;
+
+        $groups = [];
+
+        while ($this->pos < $this->len) {
+            $line = $this->lines[$this->pos];
+            if ($line === '' && ($this->pos + 1 >= $this->len || $this->lines[$this->pos + 1] === 'PHP License' || str_contains($this->lines[$this->pos + 1] ?? '', '____'))) break;
+            if ($line === 'PHP License' || str_contains($line, '_______________________________________________________________________')) break;
+
+            // Centered title (padded with spaces)
+            if (str_contains($line, '                     ')) {
+                $groupName = trim($line);
+                $this->pos++;
+                while ($this->pos < $this->len && $this->lines[$this->pos] === '') $this->pos++;
+
+                // Table heading?
+                $headings = [];
+                $firstWord = explode(' => ', $this->lines[$this->pos] ?? '')[0] ?? '';
+                if (in_array($firstWord, ['Contribution', 'Module', 'Authors'])) {
+                    $headings = explode(' => ', $this->lines[$this->pos]);
+                    $this->pos++;
+                    while ($this->pos < $this->len && $this->lines[$this->pos] === '') $this->pos++;
+                }
+
+                // Config rows
+                $configs = [];
+                while ($this->pos < $this->len && $this->lines[$this->pos] !== '' && !str_contains($this->lines[$this->pos], '______')) {
+                    if (str_contains($this->lines[$this->pos], ' => ')) {
+                        $parts = explode(' => ', $this->lines[$this->pos]);
+                        $configs[] = new Config($parts[0], $parts[1] ?? null);
+                    } else {
+                        break;
+                    }
+                    $this->pos++;
+                }
+                while ($this->pos < $this->len && $this->lines[$this->pos] === '') $this->pos++;
+
+                if (!empty($configs)) {
+                    $groups[] = new Group(
+                        items($configs),
+                        !empty($headings) ? items($headings) : null,
+                        $groupName,
+                    );
+                }
+            }
+            // Simple title + value pair (e.g. "PHP Group" followed by names)
+            elseif (!str_contains($line, ' => ') && strlen($line) < 80) {
+                $groupName = $line;
+                $this->pos++;
+                while ($this->pos < $this->len && $this->lines[$this->pos] === '') $this->pos++;
+                $value = ($this->pos < $this->len && $this->lines[$this->pos] !== '' && !str_contains($this->lines[$this->pos], '______')) ? $this->lines[$this->pos] : null;
+                if ($value !== null) $this->pos++;
+                while ($this->pos < $this->len && $this->lines[$this->pos] === '') $this->pos++;
+
+                $groups[] = new Group(
+                    $value ? items([new Config('Names', $value)]) : items(),
+                    name: $groupName,
+                );
+            } else {
+                break;
+            }
+        }
+
+        if (!empty($groups)) {
+            $modules->push(new Module('PHP Credits', items($groups)));
+        }
+    }
+
+    private function parseLicense(Items $modules): void
+    {
+        if ($this->pos >= $this->len || $this->lines[$this->pos] !== 'PHP License') return;
+
+        $this->pos++; // skip "PHP License"
+        while ($this->pos < $this->len && $this->lines[$this->pos] === '') $this->pos++;
+
+        $text = [];
+        while ($this->pos < $this->len) {
+            $text[] = $this->lines[$this->pos];
+            $this->pos++;
+        }
+
+        $note = trim(implode("\n", $text));
+        if ($note !== '') {
+            $modules->push(new Module('PHP License', items([Group::noteOnly($note)])));
+        }
+    }
+}
+}
+
+namespace {
+    if (!function_exists('items')) {
+        function items(iterable $items = []): \STS\Phpinfo\Support\Items {
+            return new \STS\Phpinfo\Support\Items($items);
+        }
+    }
+}
+
+namespace {
+
 /**
  * Pretty PHP Info — Standalone Script
  *
@@ -17,367 +898,9 @@ ob_start();
 phpinfo();
 $raw = ob_get_clean();
 
-// ── Text parser (shared with package) ─────────────────────────────────
-/**
- * Plain-PHP text parser for phpinfo() CLI output.
- *
- * This file is the single source of truth for text parsing. It is used by:
- *   - The package's TextParser class (via require)
- *   - The standalone script dist/go-standalone.php (inlined by build-go.php)
- *
- * No classes, no namespaces, no dependencies — just functions returning arrays.
- *
- * All functions use a single guard since this file may be required multiple times.
- */
+// ── Parse ────────────────────────────────────────────────────────────
 
-if (!function_exists('pp_slug')) {
-
-function pp_slug(string $text): string {
-    return strtolower(trim(preg_replace('/\W+/', '_', $text), '_'));
-}
-
-function pp_parse(string $raw): array {
-    $lines = explode("\n", str_replace("\r\n", "\n", $raw));
-    $i = 0;
-    $len = count($lines);
-
-    // Helpers
-    $current = function() use (&$lines, &$i, $len): ?string {
-        return $i < $len ? $lines[$i] : null;
-    };
-    $advance = function() use (&$i, $len, &$lines): void {
-        do { $i++; } while ($i < $len && ($lines[$i] === '' || $lines[$i] === 'Configuration'));
-    };
-    $isDivider = function() use ($current): bool {
-        return $current() !== null && str_contains($current(), '_______________________________________________________________________');
-    };
-    $hasItems = function() use ($current): bool {
-        return $current() !== null && str_contains($current(), ' => ');
-    };
-    $items = function() use ($current): array {
-        return explode(' => ', $current() ?? '');
-    };
-
-    // Skip "phpinfo()"
-    $advance();
-
-    // PHP Version
-    $version = '';
-    if ($hasItems() && ($items()[0] ?? '') === 'PHP Version') {
-        $parts = $items();
-        $version = $parts[1] ?? '';
-        $advance();
-    }
-
-    $modules = [];
-
-    // General module
-    $general = pp_parseModule('General', $lines, $i, $len);
-    if (!empty($general['groups'])) {
-        $modules[] = $general;
-    }
-
-    // Skip divider
-    if ($i < $len && $isDivider()) {
-        $advance();
-    }
-
-    // Module loop
-    while ($i < $len) {
-        $line = $current();
-        if ($line === null) break;
-        if ($isDivider()) { $advance(); continue; }
-        if ($line === 'PHP Credits' || $line === 'PHP License') break;
-
-        // Module name detection: no " => ", next line is blank, short text
-        if (!$hasItems() && strlen($line) < 80 && ($i + 1 >= $len || $lines[$i + 1] === '')) {
-            $moduleName = $line;
-            $advance();
-            $modules[] = pp_parseModule($moduleName, $lines, $i, $len);
-        } else {
-            break;
-        }
-    }
-
-    // Credits and License
-    pp_parseCredits($modules, $lines, $i, $len);
-    pp_parseLicense($modules, $lines, $i, $len);
-
-    // Filter out empty modules (e.g. "Module Name" under Additional Modules)
-    $modules = array_values(array_filter($modules, fn($m) => !empty($m['groups'])));
-
-    return ['version' => $version, 'modules' => $modules];
-}
-
-function pp_parseModule(string $name, array &$lines, int &$i, int $len): array {
-    $groups = [];
-
-    while ($i < $len) {
-        $group = pp_parseGroup($lines, $i, $len);
-        if ($group === null) break;
-        $groups[] = $group;
-    }
-
-    return [
-        'key' => 'module_' . pp_slug($name),
-        'name' => $name,
-        'groups' => $groups,
-    ];
-}
-
-function pp_parseGroup(array &$lines, int &$i, int $len): ?array {
-    if ($i >= $len) return null;
-    $line = $lines[$i] ?? null;
-    if ($line === null) return null;
-
-    // Stop at dividers or blank-followed-by-short (module names)
-    if (str_contains($line, '_______________________________________________________________________')) return null;
-    if ($line === '') { $i++; return pp_parseGroup($lines, $i, $len); }
-
-    // Check if this looks like a module name (stop parsing groups)
-    if (!str_contains($line, ' => ') && strlen($line) < 80 && ($i + 1 >= $len || $lines[$i + 1] === '')) {
-        return null;
-    }
-
-    $groupName = null;
-    $headings = [];
-    $shortHeadings = [];
-    $configs = [];
-    $note = null;
-
-    // Group title: no " => ", next line is NOT blank, short text, not a heading keyword
-    if (!str_contains($line, ' => ') && strlen($line) < 80
-        && ($i + 1 < $len && $lines[$i + 1] !== '')
-        && !in_array($line, ['Directive', 'Variable', 'Contribution', 'Module'])) {
-
-        // But also check it's not a module name
-        if (!str_contains($line, '                     ') && ($i + 1 < $len && str_contains($lines[$i + 1], ' => ') || in_array($lines[$i + 1] ?? '', ['Directive', 'Variable']))) {
-            $groupName = $line;
-            do { $i++; } while ($i < $len && $lines[$i] === '');
-            $line = $lines[$i] ?? null;
-            if ($line === null) return null;
-        }
-    }
-
-    // Table heading
-    $parts = explode(' => ', $line);
-    if (in_array($parts[0], ['Directive', 'Variable', 'Contribution', 'Module'])) {
-        $headings = $parts;
-        $shortHeadings = array_map(fn($h) => trim(str_replace('Value', '', $h)), $parts);
-        do { $i++; } while ($i < $len && $lines[$i] === '');
-        $line = $lines[$i] ?? null;
-    }
-
-    // Determine expected column count
-    $expectedCols = count($headings) ?: null;
-
-    // Parse config rows
-    while ($i < $len) {
-        $line = $lines[$i];
-        if ($line === '' || str_contains($line, '_______________________________________________________________________')) break;
-
-        if (!str_contains($line, ' => ')) {
-            // Could be a note or end of group
-            if (strlen($line) > 50) {
-                // Note
-                $noteLines = [];
-                while ($i < $len && $lines[$i] !== '' && !str_contains($lines[$i], '_____')) {
-                    $noteLines[] = $lines[$i];
-                    $i++;
-                }
-                $note = trim(implode("\n", $noteLines));
-                break;
-            }
-            break;
-        }
-
-        $parts = explode(' => ', $line);
-        $configName = $parts[0];
-        $localValue = $parts[1] ?? null;
-        $masterValue = null;
-        $hasMaster = false;
-
-        if ($expectedCols === 3 && count($parts) >= 3) {
-            $masterValue = $parts[2];
-            $hasMaster = true;
-        } elseif ($expectedCols === null && count($parts) >= 3) {
-            $masterValue = $parts[2];
-            $hasMaster = true;
-        }
-
-        // Multi-line values (comma-continued)
-        while ($localValue !== null && str_ends_with($localValue, ',') && $i + 1 < $len) {
-            $i++;
-            $localValue .= "\n" . $lines[$i];
-        }
-
-        // Multi-line Array dumps (e.g. $_SERVER['argv'] => Array\n(\n...\n))
-        if ($localValue !== null && $localValue === 'Array') {
-            $i++;
-            while ($i < $len && trim($lines[$i]) !== ')') {
-                $localValue .= "\n" . $lines[$i];
-                $i++;
-            }
-            if ($i < $len) {
-                $localValue .= "\n" . $lines[$i];
-            }
-        }
-
-        $configs[] = [
-            'key' => $configName === 'Names'
-                ? 'config_names_' . md5($localValue ?? '')
-                : 'config_' . pp_slug($configName),
-            'name' => $configName,
-            'hasMasterValue' => $hasMaster,
-            'localValue' => ($localValue === 'no value') ? null : $localValue,
-            'masterValue' => $hasMaster ? (($masterValue === 'no value') ? null : $masterValue) : null,
-        ];
-
-        $i++;
-    }
-
-    if (empty($configs) && $note === null && $groupName === null) return null;
-
-    return [
-        'key' => $groupName ? 'group_' . pp_slug($groupName) : 'group_' . md5(implode(',', array_column($configs, 'name'))),
-        'name' => $groupName,
-        'headings' => $headings,
-        'shortHeadings' => $shortHeadings,
-        'configs' => $configs,
-        'note' => $note,
-    ];
-}
-
-function pp_parseCredits(array &$modules, array &$lines, int &$i, int $len): void {
-    if ($i >= $len || $lines[$i] !== 'PHP Credits') return;
-
-    $i++; // skip "PHP Credits"
-    while ($i < $len && $lines[$i] === '') $i++;
-
-    $groups = [];
-
-    while ($i < $len) {
-        $line = $lines[$i];
-        if ($line === '' && ($i + 1 >= $len || $lines[$i + 1] === 'PHP License' || str_contains($lines[$i + 1] ?? '', '____'))) break;
-        if ($line === 'PHP License' || str_contains($line, '_______________________________________________________________________')) break;
-
-        // Centered title (padded with spaces)
-        if (str_contains($line, '                     ')) {
-            $groupName = trim($line);
-            $i++;
-            while ($i < $len && $lines[$i] === '') $i++;
-
-            // Table heading?
-            $headings = [];
-            $shortHeadings = [];
-            $firstWord = explode(' => ', $lines[$i] ?? '')[0] ?? '';
-            if (in_array($firstWord, ['Contribution', 'Module', 'Authors'])) {
-                $headings = explode(' => ', $lines[$i]);
-                $shortHeadings = array_map(fn($h) => trim(str_replace('Value', '', $h)), $headings);
-                $i++;
-                while ($i < $len && $lines[$i] === '') $i++;
-            }
-
-            // Config rows
-            $configs = [];
-            while ($i < $len && $lines[$i] !== '' && !str_contains($lines[$i], '______')) {
-                if (str_contains($lines[$i], ' => ')) {
-                    $parts = explode(' => ', $lines[$i]);
-                    $configs[] = [
-                        'key' => 'config_' . pp_slug($parts[0]),
-                        'name' => $parts[0],
-                        'hasMasterValue' => false,
-                        'localValue' => $parts[1] ?? null,
-                        'masterValue' => null,
-                    ];
-                } else {
-                    break;
-                }
-                $i++;
-            }
-            while ($i < $len && $lines[$i] === '') $i++;
-
-            if (!empty($configs)) {
-                $groups[] = [
-                    'key' => 'group_' . pp_slug($groupName),
-                    'name' => $groupName,
-                    'headings' => $headings,
-                    'shortHeadings' => $shortHeadings,
-                    'configs' => $configs,
-                    'note' => null,
-                ];
-            }
-        }
-        // Simple title + value pair (e.g. "PHP Group" followed by names)
-        elseif (!str_contains($line, ' => ') && strlen($line) < 80) {
-            $groupName = $line;
-            $i++;
-            while ($i < $len && $lines[$i] === '') $i++;
-            $value = ($i < $len && $lines[$i] !== '' && !str_contains($lines[$i], '______')) ? $lines[$i] : null;
-            if ($value !== null) $i++;
-            while ($i < $len && $lines[$i] === '') $i++;
-
-            $groups[] = [
-                'key' => 'group_' . pp_slug($groupName),
-                'name' => $groupName,
-                'headings' => [],
-                'shortHeadings' => [],
-                'configs' => $value ? [[
-                    'key' => 'config_names_' . md5($value),
-                    'name' => 'Names',
-                    'hasMasterValue' => false,
-                    'localValue' => $value,
-                    'masterValue' => null,
-                ]] : [],
-                'note' => null,
-            ];
-        } else {
-            break;
-        }
-    }
-
-    if (!empty($groups)) {
-        $modules[] = [
-            'key' => 'module_' . pp_slug('PHP Credits'),
-            'name' => 'PHP Credits',
-            'groups' => $groups,
-        ];
-    }
-}
-
-function pp_parseLicense(array &$modules, array &$lines, int &$i, int $len): void {
-    if ($i >= $len || $lines[$i] !== 'PHP License') return;
-
-    $i++; // skip "PHP License"
-    while ($i < $len && $lines[$i] === '') $i++;
-
-    $text = [];
-    while ($i < $len) {
-        $text[] = $lines[$i];
-        $i++;
-    }
-
-    $note = trim(implode("\n", $text));
-    if ($note !== '') {
-        $modules[] = [
-            'key' => 'module_' . pp_slug('PHP License'),
-            'name' => 'PHP License',
-            'groups' => [[
-                'key' => 'group_license',
-                'name' => null,
-                'headings' => [],
-                'shortHeadings' => [],
-                'configs' => [],
-                'note' => $note,
-            ]],
-        ];
-    }
-}
-
-} // end function_exists guard
-
-
-$info = pp_parse($raw);
+$info = (new \STS\Phpinfo\Parsers\TextParser($raw))->parse();
 
 // ── Output complete HTML page ─────────────────────────────────────────
 ob_start();
@@ -403,8 +926,8 @@ ob_start();
     <header class="absolute top-0 h-14 lg:h-16 w-full flex items-center justify-between py-3 px-6 xl:px-8 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
         <div class="flex-1 md:flex items-center gap-3">
             <img class="h-6 md:h-10 dark:invert" src="data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -1 100 50'%3E%3Cpath d='m7.579 10.123 14.204 0c4.169 0.035 7.19 1.237 9.063 3.604 1.873 2.367 2.491 5.6 1.855 9.699-0.247 1.873-0.795 3.71-1.643 5.512-0.813 1.802-1.943 3.427-3.392 4.876-1.767 1.837-3.657 3.003-5.671 3.498-2.014 0.495-4.099 0.742-6.254 0.742l-6.36 0-2.014 10.07-7.367 0 7.579-38.001 0 0m6.201 6.042-3.18 15.9c0.212 0.035 0.424 0.053 0.636 0.053 0.247 0 0.495 0 0.742 0 3.392 0.035 6.219-0.3 8.48-1.007 2.261-0.742 3.781-3.321 4.558-7.738 0.636-3.71 0-5.848-1.908-6.413-1.873-0.565-4.222-0.83-7.049-0.795-0.424 0.035-0.83 0.053-1.219 0.053-0.353 0-0.724 0-1.113 0l0.053-0.053'/%3E%3Cpath d='m41.093 0 7.314 0-2.067 10.123 6.572 0c3.604 0.071 6.289 0.813 8.056 2.226 1.802 1.413 2.332 4.099 1.59 8.056l-3.551 17.649-7.42 0 3.392-16.854c0.353-1.767 0.247-3.021-0.318-3.763-0.565-0.742-1.784-1.113-3.657-1.113l-5.883-0.053-4.346 21.783-7.314 0 7.632-38.054 0 0'/%3E%3Cpath d='m70.412 10.123 14.204 0c4.169 0.035 7.19 1.237 9.063 3.604 1.873 2.367 2.491 5.6 1.855 9.699-0.247 1.873-0.795 3.71-1.643 5.512-0.813 1.802-1.943 3.427-3.392 4.876-1.767 1.837-3.657 3.003-5.671 3.498-2.014 0.495-4.099 0.742-6.254 0.742l-6.36 0-2.014 10.07-7.367 0 7.579-38.001 0 0m6.201 6.042-3.18 15.9c0.212 0.035 0.424 0.053 0.636 0.053 0.247 0 0.495 0 0.742 0 3.392 0.035 6.219-0.3 8.48-1.007 2.261-0.742 3.781-3.321 4.558-7.738 0.636-3.71 0-5.848-1.908-6.413-1.873-0.565-4.222-0.83-7.049-0.795-0.424 0.035-0.83 0.053-1.219 0.053-0.353 0-0.724 0-1.113 0l0.053-0.053'/%3E%3C/svg%3E%0A"/>
-            <span class="hidden md:inline-block text-sm font-mono text-slate-400 dark:text-slate-500"><?php echo $info['version'] ?></span>
-            <span class="md:hidden text-xs font-mono text-slate-400"><?php echo $info['version'] ?></span>
+            <span class="hidden md:inline-block text-sm font-mono text-slate-400 dark:text-slate-500"><?php echo $info->version() ?></span>
+            <span class="md:hidden text-xs font-mono text-slate-400"><?php echo $info->version() ?></span>
         </div>
         <div class="flex-1 flex justify-center">
             <div class="relative group">
@@ -544,7 +1067,7 @@ ob_start();
             hash: null,
             mobileNav: false,
             info: <?php echo json_encode($info) ?>,
-            sections: <?php echo json_encode(array_column($info['modules'], 'key')) ?>,
+            sections: <?php echo json_encode($info->modules()->map(fn($m) => $m->key())->all()) ?>,
             selected: null,
             selectedIndex: null,
             initialized: false,
@@ -704,3 +1227,5 @@ fwrite(STDERR, $opened
     ? "Opened in your browser.\n"
     : "Saved to $file\n"
 );
+
+}
