@@ -504,7 +504,7 @@ class PhpInfo implements JsonSerializable
     public function render(): void
     {
         $info = $this;
-        include __DIR__ . '/../dist/default.php';
+        include __DIR__ . '/../resources/template.php';
     }
 
     public function jsonSerialize(): mixed
@@ -912,8 +912,10 @@ ob_start();
     <meta charset="utf-8">
     <title>Pretty PHP Info</title>
     <link rel="shortcut icon" type="image/svg" href="data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -1 100 50'%3E%3Cpath d='m7.579 10.123 14.204 0c4.169 0.035 7.19 1.237 9.063 3.604 1.873 2.367 2.491 5.6 1.855 9.699-0.247 1.873-0.795 3.71-1.643 5.512-0.813 1.802-1.943 3.427-3.392 4.876-1.767 1.837-3.657 3.003-5.671 3.498-2.014 0.495-4.099 0.742-6.254 0.742l-6.36 0-2.014 10.07-7.367 0 7.579-38.001 0 0m6.201 6.042-3.18 15.9c0.212 0.035 0.424 0.053 0.636 0.053 0.247 0 0.495 0 0.742 0 3.392 0.035 6.219-0.3 8.48-1.007 2.261-0.742 3.781-3.321 4.558-7.738 0.636-3.71 0-5.848-1.908-6.413-1.873-0.565-4.222-0.83-7.049-0.795-0.424 0.035-0.83 0.053-1.219 0.053-0.353 0-0.724 0-1.113 0l0.053-0.053'/%3E%3Cpath d='m41.093 0 7.314 0-2.067 10.123 6.572 0c3.604 0.071 6.289 0.813 8.056 2.226 1.802 1.413 2.332 4.099 1.59 8.056l-3.551 17.649-7.42 0 3.392-16.854c0.353-1.767 0.247-3.021-0.318-3.763-0.565-0.742-1.784-1.113-3.657-1.113l-5.883-0.053-4.346 21.783-7.314 0 7.632-38.054 0 0'/%3E%3Cpath d='m70.412 10.123 14.204 0c4.169 0.035 7.19 1.237 9.063 3.604 1.873 2.367 2.491 5.6 1.855 9.699-0.247 1.873-0.795 3.71-1.643 5.512-0.813 1.802-1.943 3.427-3.392 4.876-1.767 1.837-3.657 3.003-5.671 3.498-2.014 0.495-4.099 0.742-6.254 0.742l-6.36 0-2.014 10.07-7.367 0 7.579-38.001 0 0m6.201 6.042-3.18 15.9c0.212 0.035 0.424 0.053 0.636 0.053 0.247 0 0.495 0 0.742 0 3.392 0.035 6.219-0.3 8.48-1.007 2.261-0.742 3.781-3.321 4.558-7.738 0.636-3.71 0-5.848-1.908-6.413-1.873-0.565-4.222-0.83-7.049-0.795-0.424 0.035-0.83 0.053-1.219 0.053-0.353 0-0.724 0-1.113 0l0.053-0.053'/%3E%3C/svg%3E%0A">
+
     <meta name="description" content="View your phpinfo() output in a pretty, responsive, searchable interface">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style>
         /*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */
 @layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-space-y-reverse:0;--tw-border-style:solid;--tw-gradient-position:initial;--tw-gradient-from:#0000;--tw-gradient-via:#0000;--tw-gradient-to:#0000;--tw-gradient-stops:initial;--tw-gradient-via-stops:initial;--tw-gradient-from-position:0%;--tw-gradient-via-position:50%;--tw-gradient-to-position:100%;--tw-font-weight:initial;--tw-tracking:initial;--tw-blur:initial;--tw-brightness:initial;--tw-contrast:initial;--tw-grayscale:initial;--tw-hue-rotate:initial;--tw-invert:initial;--tw-opacity:initial;--tw-saturate:initial;--tw-sepia:initial;--tw-drop-shadow:initial;--tw-drop-shadow-color:initial;--tw-drop-shadow-alpha:100%;--tw-drop-shadow-size:initial;--tw-backdrop-blur:initial;--tw-backdrop-brightness:initial;--tw-backdrop-contrast:initial;--tw-backdrop-grayscale:initial;--tw-backdrop-hue-rotate:initial;--tw-backdrop-invert:initial;--tw-backdrop-opacity:initial;--tw-backdrop-saturate:initial;--tw-backdrop-sepia:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-outline-style:solid}}}@layer theme{:root,:host{--font-sans:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";--font-mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;--color-blue-50:oklch(97% .014 254.604);--color-blue-400:oklch(70.7% .165 254.624);--color-blue-600:oklch(54.6% .245 262.881);--color-blue-950:oklch(28.2% .091 267.935);--color-slate-50:oklch(98.4% .003 247.858);--color-slate-100:oklch(96.8% .007 247.896);--color-slate-200:oklch(92.9% .013 255.508);--color-slate-300:oklch(86.9% .022 252.894);--color-slate-400:oklch(70.4% .04 256.788);--color-slate-500:oklch(55.4% .046 257.417);--color-slate-600:oklch(44.6% .043 257.281);--color-slate-700:oklch(37.2% .044 257.287);--color-slate-800:oklch(27.9% .041 260.031);--color-slate-900:oklch(20.8% .042 265.755);--color-slate-950:oklch(12.9% .042 264.695);--color-white:#fff;--spacing:.25rem;--container-3xl:48rem;--text-xs:.75rem;--text-xs--line-height:calc(1 / .75);--text-sm:.875rem;--text-sm--line-height:calc(1.25 / .875);--text-lg:1.125rem;--text-lg--line-height:calc(1.75 / 1.125);--text-xl:1.25rem;--text-xl--line-height:calc(1.75 / 1.25);--font-weight-medium:500;--font-weight-semibold:600;--tracking-tight:-.025em;--tracking-wider:.05em;--radius-md:.375rem;--radius-lg:.5rem;--blur-sm:8px;--default-transition-duration:.15s;--default-transition-timing-function:cubic-bezier(.4, 0, .2, 1);--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono)}}@layer base{*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}::file-selector-button{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;tab-size:4;line-height:1.5;font-family:var(--default-font-family,ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;-webkit-text-decoration:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:var(--default-mono-font-family,ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-variation-settings:var(--default-mono-font-variation-settings,normal);font-size:1em}small{font-size:80%}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}ol,ul,menu{list-style:none}img,svg,video,canvas,audio,iframe,embed,object{vertical-align:middle;display:block}img,video{max-width:100%;height:auto}button,input,select,optgroup,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}::file-selector-button{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px){::placeholder{color:currentColor}@supports (color:color-mix(in lab, red, red)){::placeholder{color:color-mix(in oklab, currentcolor 50%, transparent)}}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit{padding-block:0}::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-month-field{padding-block:0}::-webkit-datetime-edit-day-field{padding-block:0}::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field{padding-block:0}::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-millisecond-field{padding-block:0}::-webkit-datetime-edit-meridiem-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){appearance:button}::file-selector-button{appearance:button}::-webkit-inner-spin-button{height:auto}::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}}@layer components;@layer utilities{.pointer-events-none{pointer-events:none}.collapse{visibility:collapse}.visible{visibility:visible}.absolute{position:absolute}.fixed{position:fixed}.relative{position:relative}.static{position:static}.sticky{position:sticky}.inset-0{inset:calc(var(--spacing) * 0)}.start{inset-inline-start:var(--spacing)}.end{inset-inline-end:var(--spacing)}.top-0{top:calc(var(--spacing) * 0)}.top-2{top:calc(var(--spacing) * 2)}.top-14{top:calc(var(--spacing) * 14)}.right-0{right:calc(var(--spacing) * 0)}.right-2{right:calc(var(--spacing) * 2)}.right-6{right:calc(var(--spacing) * 6)}.bottom-0{bottom:calc(var(--spacing) * 0)}.bottom-6{bottom:calc(var(--spacing) * 6)}.left-0{left:calc(var(--spacing) * 0)}.z-10{z-index:10}.z-20{z-index:20}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-inline:auto}.my-3{margin-block:calc(var(--spacing) * 3)}.mt-1\.5{margin-top:calc(var(--spacing) * 1.5)}.mt-3{margin-top:calc(var(--spacing) * 3)}.mt-20{margin-top:calc(var(--spacing) * 20)}.-mr-2{margin-right:calc(var(--spacing) * -2)}.mr-1{margin-right:calc(var(--spacing) * 1)}.mr-3{margin-right:calc(var(--spacing) * 3)}.mr-4{margin-right:calc(var(--spacing) * 4)}.ml-1{margin-left:calc(var(--spacing) * 1)}.block{display:block}.flex{display:flex}.hidden{display:none}.inline{display:inline}.inline-block{display:inline-block}.inline-flex{display:inline-flex}.table{display:table}.h-3{height:calc(var(--spacing) * 3)}.h-3\.5{height:calc(var(--spacing) * 3.5)}.h-4{height:calc(var(--spacing) * 4)}.h-5{height:calc(var(--spacing) * 5)}.h-6{height:calc(var(--spacing) * 6)}.h-8{height:calc(var(--spacing) * 8)}.h-12{height:calc(var(--spacing) * 12)}.h-14{height:calc(var(--spacing) * 14)}.w-3{width:calc(var(--spacing) * 3)}.w-3\.5{width:calc(var(--spacing) * 3.5)}.w-4{width:calc(var(--spacing) * 4)}.w-5{width:calc(var(--spacing) * 5)}.w-6{width:calc(var(--spacing) * 6)}.w-8{width:calc(var(--spacing) * 8)}.w-14{width:calc(var(--spacing) * 14)}.w-48{width:calc(var(--spacing) * 48)}.w-80{width:calc(var(--spacing) * 80)}.w-full{width:100%}.max-w-3xl{max-width:var(--container-3xl)}.max-w-\[96rem\]{max-width:96rem}.flex-1{flex:1}.flex-shrink-0{flex-shrink:0}.border-collapse{border-collapse:collapse}.transform{transform:var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,)}.scroll-mt-14{scroll-margin-top:calc(var(--spacing) * 14)}.scroll-py-6{scroll-padding-block:calc(var(--spacing) * 6)}.scroll-pt-14{scroll-padding-top:calc(var(--spacing) * 14)}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-between{justify-content:space-between}.justify-center{justify-content:center}.justify-end{justify-content:flex-end}.gap-2{gap:calc(var(--spacing) * 2)}.gap-3{gap:calc(var(--spacing) * 3)}.gap-4{gap:calc(var(--spacing) * 4)}:where(.space-y-0\.5>:not(:last-child)){--tw-space-y-reverse:0;margin-block-start:calc(calc(var(--spacing) * .5) * var(--tw-space-y-reverse));margin-block-end:calc(calc(var(--spacing) * .5) * calc(1 - var(--tw-space-y-reverse)))}:where(.space-y-px>:not(:last-child)){--tw-space-y-reverse:0;margin-block-start:calc(1px * var(--tw-space-y-reverse));margin-block-end:calc(1px * calc(1 - var(--tw-space-y-reverse)))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.rounded{border-radius:.25rem}.rounded-lg{border-radius:var(--radius-lg)}.rounded-md{border-radius:var(--radius-md)}.border{border-style:var(--tw-border-style);border-width:1px}.border-r{border-right-style:var(--tw-border-style);border-right-width:1px}.border-b{border-bottom-style:var(--tw-border-style);border-bottom-width:1px}.border-slate-100{border-color:var(--color-slate-100)}.border-slate-200{border-color:var(--color-slate-200)}.border-slate-300{border-color:var(--color-slate-300)}.border-slate-600{border-color:var(--color-slate-600)}.bg-blue-50{background-color:var(--color-blue-50)}.bg-slate-50\/50{background-color:#f8fafc80}@supports (color:color-mix(in lab, red, red)){.bg-slate-50\/50{background-color:color-mix(in oklab, var(--color-slate-50) 50%, transparent)}}.bg-slate-100{background-color:var(--color-slate-100)}.bg-slate-600{background-color:var(--color-slate-600)}.bg-slate-800{background-color:var(--color-slate-800)}.bg-slate-900{background-color:var(--color-slate-900)}.bg-slate-900\/50{background-color:#0f172b80}@supports (color:color-mix(in lab, red, red)){.bg-slate-900\/50{background-color:color-mix(in oklab, var(--color-slate-900) 50%, transparent)}}.bg-transparent{background-color:#0000}.bg-white{background-color:var(--color-white)}.bg-white\/80{background-color:#fffc}@supports (color:color-mix(in lab, red, red)){.bg-white\/80{background-color:color-mix(in oklab, var(--color-white) 80%, transparent)}}.bg-gradient-to-b{--tw-gradient-position:to bottom in oklab;background-image:linear-gradient(var(--tw-gradient-stops))}.bg-gradient-to-t{--tw-gradient-position:to top in oklab;background-image:linear-gradient(var(--tw-gradient-stops))}.from-slate-800{--tw-gradient-from:var(--color-slate-800);--tw-gradient-stops:var(--tw-gradient-via-stops,var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}.from-white{--tw-gradient-from:var(--color-white);--tw-gradient-stops:var(--tw-gradient-via-stops,var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}.via-slate-800\/75{--tw-gradient-via:#1d293dbf}@supports (color:color-mix(in lab, red, red)){.via-slate-800\/75{--tw-gradient-via:color-mix(in oklab, var(--color-slate-800) 75%, transparent)}}.via-slate-800\/75{--tw-gradient-via-stops:var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-via-stops)}.to-transparent{--tw-gradient-to:transparent;--tw-gradient-stops:var(--tw-gradient-via-stops,var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}.p-1{padding:calc(var(--spacing) * 1)}.p-1\.5{padding:calc(var(--spacing) * 1.5)}.p-2{padding:calc(var(--spacing) * 2)}.p-4{padding:calc(var(--spacing) * 4)}.p-6{padding:calc(var(--spacing) * 6)}.px-1\.5{padding-inline:calc(var(--spacing) * 1.5)}.px-3{padding-inline:calc(var(--spacing) * 3)}.px-4{padding-inline:calc(var(--spacing) * 4)}.px-6{padding-inline:calc(var(--spacing) * 6)}.py-0\.5{padding-block:calc(var(--spacing) * .5)}.py-1{padding-block:calc(var(--spacing) * 1)}.py-1\.5{padding-block:calc(var(--spacing) * 1.5)}.py-2{padding-block:calc(var(--spacing) * 2)}.py-2\.5{padding-block:calc(var(--spacing) * 2.5)}.py-3{padding-block:calc(var(--spacing) * 3)}.py-6{padding-block:calc(var(--spacing) * 6)}.py-8{padding-block:calc(var(--spacing) * 8)}.pt-14{padding-top:calc(var(--spacing) * 14)}.pt-16{padding-top:calc(var(--spacing) * 16)}.pl-6{padding-left:calc(var(--spacing) * 6)}.text-center{text-align:center}.text-left{text-align:left}.align-top{vertical-align:top}.font-mono{font-family:var(--font-mono)}.font-sans{font-family:var(--font-sans)}.text-lg{font-size:var(--text-lg);line-height:var(--tw-leading,var(--text-lg--line-height))}.text-sm{font-size:var(--text-sm);line-height:var(--tw-leading,var(--text-sm--line-height))}.text-xl{font-size:var(--text-xl);line-height:var(--tw-leading,var(--text-xl--line-height))}.text-xs{font-size:var(--text-xs);line-height:var(--tw-leading,var(--text-xs--line-height))}.text-\[13px\]{font-size:13px}.font-medium{--tw-font-weight:var(--font-weight-medium);font-weight:var(--font-weight-medium)}.font-semibold{--tw-font-weight:var(--font-weight-semibold);font-weight:var(--font-weight-semibold)}.tracking-tight{--tw-tracking:var(--tracking-tight);letter-spacing:var(--tracking-tight)}.tracking-wider{--tw-tracking:var(--tracking-wider);letter-spacing:var(--tracking-wider)}.text-blue-600{color:var(--color-blue-600)}.text-slate-300{color:var(--color-slate-300)}.text-slate-400{color:var(--color-slate-400)}.text-slate-500{color:var(--color-slate-500)}.text-slate-600{color:var(--color-slate-600)}.text-slate-700{color:var(--color-slate-700)}.text-slate-900{color:var(--color-slate-900)}.text-white{color:var(--color-white)}.uppercase{text-transform:uppercase}.italic{font-style:italic}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-50{opacity:.5}.filter{filter:var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)}.backdrop-blur-sm{--tw-backdrop-blur:blur(var(--blur-sm));-webkit-backdrop-filter:var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);backdrop-filter:var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,)}.transition{transition-property:color,background-color,border-color,outline-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to,opacity,box-shadow,transform,translate,scale,rotate,filter,-webkit-backdrop-filter,backdrop-filter,display,content-visibility,overlay,pointer-events;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-colors{transition-property:color,background-color,border-color,outline-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}@media (hover:hover){.group-hover\:inline:is(:where(.group):hover *){display:inline}}.placeholder\:text-slate-400::placeholder{color:var(--color-slate-400)}.last\:border-0:last-child{border-style:var(--tw-border-style);border-width:0}.empty\:hidden:empty{display:none}@media (hover:hover){.hover\:bg-slate-50:hover{background-color:var(--color-slate-50)}.hover\:bg-slate-100:hover{background-color:var(--color-slate-100)}.hover\:text-slate-600:hover{color:var(--color-slate-600)}.hover\:text-slate-900:hover{color:var(--color-slate-900)}.hover\:underline:hover{text-decoration-line:underline}}.focus\:ring-2:focus{--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.focus\:ring-slate-900\/10:focus{--tw-ring-color:#0f172b1a}@supports (color:color-mix(in lab, red, red)){.focus\:ring-slate-900\/10:focus{--tw-ring-color:color-mix(in oklab, var(--color-slate-900) 10%, transparent)}}.focus\:outline-0:focus{outline-style:var(--tw-outline-style);outline-width:0}@media (min-width:48rem){.md\:relative{position:relative}.md\:mb-6{margin-bottom:calc(var(--spacing) * 6)}.md\:ml-52{margin-left:calc(var(--spacing) * 52)}.md\:block{display:block}.md\:flex{display:flex}.md\:hidden{display:none}.md\:inline-block{display:inline-block}.md\:h-10{height:calc(var(--spacing) * 10)}.md\:w-72{width:calc(var(--spacing) * 72)}.md\:scroll-mt-6{scroll-margin-top:calc(var(--spacing) * 6)}.md\:scroll-mt-8{scroll-margin-top:calc(var(--spacing) * 8)}:where(.md\:space-y-3>:not(:last-child)){--tw-space-y-reverse:0;margin-block-start:calc(calc(var(--spacing) * 3) * var(--tw-space-y-reverse));margin-block-end:calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-y-reverse)))}.md\:rounded-lg{border-radius:var(--radius-lg)}.md\:border{border-style:var(--tw-border-style);border-width:1px}.md\:border-0{border-style:var(--tw-border-style);border-width:0}.md\:px-4{padding-inline:calc(var(--spacing) * 4)}.md\:py-0{padding-block:calc(var(--spacing) * 0)}.md\:pl-0{padding-left:calc(var(--spacing) * 0)}.md\:text-sm{font-size:var(--text-sm);line-height:var(--tw-leading,var(--text-sm--line-height))}}@media (min-width:64rem){.lg\:top-16{top:calc(var(--spacing) * 16)}.lg\:mb-10{margin-bottom:calc(var(--spacing) * 10)}.lg\:ml-60{margin-left:calc(var(--spacing) * 60)}.lg\:hidden{display:none}.lg\:table-row{display:table-row}.lg\:h-16{height:calc(var(--spacing) * 16)}.lg\:w-1\/4{width:25%}.lg\:w-56{width:calc(var(--spacing) * 56)}.lg\:w-96{width:calc(var(--spacing) * 96)}.lg\:scroll-pt-16{scroll-padding-top:calc(var(--spacing) * 16)}:where(.lg\:space-y-5>:not(:last-child)){--tw-space-y-reverse:0;margin-block-start:calc(calc(var(--spacing) * 5) * var(--tw-space-y-reverse));margin-block-end:calc(calc(var(--spacing) * 5) * calc(1 - var(--tw-space-y-reverse)))}.lg\:px-4{padding-inline:calc(var(--spacing) * 4)}.lg\:py-0{padding-block:calc(var(--spacing) * 0)}.lg\:py-2\.5{padding-block:calc(var(--spacing) * 2.5)}.lg\:pt-16{padding-top:calc(var(--spacing) * 16)}.lg\:pl-4{padding-left:calc(var(--spacing) * 4)}@media (hover:hover){.lg\:group-hover\/cell\:inline-flex:is(:where(.group\/cell):hover *){display:inline-flex}.lg\:hover\:bg-blue-50:hover{background-color:var(--color-blue-50)}.lg\:hover\:bg-slate-50\/75:hover{background-color:#f8fafcbf}@supports (color:color-mix(in lab, red, red)){.lg\:hover\:bg-slate-50\/75:hover{background-color:color-mix(in oklab, var(--color-slate-50) 75%, transparent)}}}}@media (min-width:80rem){.xl\:ml-72{margin-left:calc(var(--spacing) * 72)}.xl\:w-64{width:calc(var(--spacing) * 64)}.xl\:px-4{padding-inline:calc(var(--spacing) * 4)}.xl\:px-8{padding-inline:calc(var(--spacing) * 8)}.xl\:pr-8{padding-right:calc(var(--spacing) * 8)}}.dark\:border-slate-600:where(.dark,.dark *){border-color:var(--color-slate-600)}.dark\:border-slate-700:where(.dark,.dark *){border-color:var(--color-slate-700)}.dark\:border-slate-800:where(.dark,.dark *){border-color:var(--color-slate-800)}.dark\:border-slate-800\/75:where(.dark,.dark *){border-color:#1d293dbf}@supports (color:color-mix(in lab, red, red)){.dark\:border-slate-800\/75:where(.dark,.dark *){border-color:color-mix(in oklab, var(--color-slate-800) 75%, transparent)}}.dark\:bg-blue-950\/30:where(.dark,.dark *){background-color:#1624564d}@supports (color:color-mix(in lab, red, red)){.dark\:bg-blue-950\/30:where(.dark,.dark *){background-color:color-mix(in oklab, var(--color-blue-950) 30%, transparent)}}.dark\:bg-slate-100:where(.dark,.dark *){background-color:var(--color-slate-100)}.dark\:bg-slate-700:where(.dark,.dark *){background-color:var(--color-slate-700)}.dark\:bg-slate-800:where(.dark,.dark *){background-color:var(--color-slate-800)}.dark\:bg-slate-900\/50:where(.dark,.dark *){background-color:#0f172b80}@supports (color:color-mix(in lab, red, red)){.dark\:bg-slate-900\/50:where(.dark,.dark *){background-color:color-mix(in oklab, var(--color-slate-900) 50%, transparent)}}.dark\:bg-slate-950:where(.dark,.dark *){background-color:var(--color-slate-950)}.dark\:bg-slate-950\/80:where(.dark,.dark *){background-color:#020618cc}@supports (color:color-mix(in lab, red, red)){.dark\:bg-slate-950\/80:where(.dark,.dark *){background-color:color-mix(in oklab, var(--color-slate-950) 80%, transparent)}}.dark\:bg-transparent:where(.dark,.dark *){background-color:#0000}.dark\:from-slate-700:where(.dark,.dark *){--tw-gradient-from:var(--color-slate-700);--tw-gradient-stops:var(--tw-gradient-via-stops,var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}.dark\:from-slate-950:where(.dark,.dark *){--tw-gradient-from:var(--color-slate-950);--tw-gradient-stops:var(--tw-gradient-via-stops,var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}.dark\:via-slate-700\/75:where(.dark,.dark *){--tw-gradient-via:#314158bf}@supports (color:color-mix(in lab, red, red)){.dark\:via-slate-700\/75:where(.dark,.dark *){--tw-gradient-via:color-mix(in oklab, var(--color-slate-700) 75%, transparent)}}.dark\:via-slate-700\/75:where(.dark,.dark *){--tw-gradient-via-stops:var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-via-stops)}.dark\:text-blue-400:where(.dark,.dark *){color:var(--color-blue-400)}.dark\:text-slate-100:where(.dark,.dark *){color:var(--color-slate-100)}.dark\:text-slate-200:where(.dark,.dark *){color:var(--color-slate-200)}.dark\:text-slate-300:where(.dark,.dark *){color:var(--color-slate-300)}.dark\:text-slate-400:where(.dark,.dark *){color:var(--color-slate-400)}.dark\:text-slate-500:where(.dark,.dark *){color:var(--color-slate-500)}.dark\:text-slate-600:where(.dark,.dark *){color:var(--color-slate-600)}.dark\:text-slate-900:where(.dark,.dark *){color:var(--color-slate-900)}.dark\:\[color-scheme\:dark\]:where(.dark,.dark *){color-scheme:dark}.dark\:invert:where(.dark,.dark *){--tw-invert:invert(100%);filter:var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)}@media (hover:hover){.dark\:hover\:bg-slate-800:where(.dark,.dark *):hover{background-color:var(--color-slate-800)}.dark\:hover\:bg-slate-800\/50:where(.dark,.dark *):hover{background-color:#1d293d80}@supports (color:color-mix(in lab, red, red)){.dark\:hover\:bg-slate-800\/50:where(.dark,.dark *):hover{background-color:color-mix(in oklab, var(--color-slate-800) 50%, transparent)}}.dark\:hover\:text-slate-200:where(.dark,.dark *):hover{color:var(--color-slate-200)}.dark\:hover\:text-slate-300:where(.dark,.dark *):hover{color:var(--color-slate-300)}}.dark\:focus\:text-slate-100:where(.dark,.dark *):focus{color:var(--color-slate-100)}.dark\:focus\:ring-slate-300\/20:where(.dark,.dark *):focus{--tw-ring-color:#cad5e233}@supports (color:color-mix(in lab, red, red)){.dark\:focus\:ring-slate-300\/20:where(.dark,.dark *):focus{--tw-ring-color:color-mix(in oklab, var(--color-slate-300) 20%, transparent)}}@media (min-width:64rem){@media (hover:hover){.lg\:dark\:hover\:bg-blue-950\/30:where(.dark,.dark *):hover{background-color:#1624564d}@supports (color:color-mix(in lab, red, red)){.lg\:dark\:hover\:bg-blue-950\/30:where(.dark,.dark *):hover{background-color:color-mix(in oklab, var(--color-blue-950) 30%, transparent)}}.lg\:dark\:hover\:bg-slate-800\/40:where(.dark,.dark *):hover{background-color:#1d293d66}@supports (color:color-mix(in lab, red, red)){.lg\:dark\:hover\:bg-slate-800\/40:where(.dark,.dark *):hover{background-color:color-mix(in oklab, var(--color-slate-800) 40%, transparent)}}}}}[x-cloak]{display:none!important}@property --tw-rotate-x{syntax:"*";inherits:false}@property --tw-rotate-y{syntax:"*";inherits:false}@property --tw-rotate-z{syntax:"*";inherits:false}@property --tw-skew-x{syntax:"*";inherits:false}@property --tw-skew-y{syntax:"*";inherits:false}@property --tw-space-y-reverse{syntax:"*";inherits:false;initial-value:0}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}@property --tw-gradient-position{syntax:"*";inherits:false}@property --tw-gradient-from{syntax:"<color>";inherits:false;initial-value:#0000}@property --tw-gradient-via{syntax:"<color>";inherits:false;initial-value:#0000}@property --tw-gradient-to{syntax:"<color>";inherits:false;initial-value:#0000}@property --tw-gradient-stops{syntax:"*";inherits:false}@property --tw-gradient-via-stops{syntax:"*";inherits:false}@property --tw-gradient-from-position{syntax:"<length-percentage>";inherits:false;initial-value:0%}@property --tw-gradient-via-position{syntax:"<length-percentage>";inherits:false;initial-value:50%}@property --tw-gradient-to-position{syntax:"<length-percentage>";inherits:false;initial-value:100%}@property --tw-font-weight{syntax:"*";inherits:false}@property --tw-tracking{syntax:"*";inherits:false}@property --tw-blur{syntax:"*";inherits:false}@property --tw-brightness{syntax:"*";inherits:false}@property --tw-contrast{syntax:"*";inherits:false}@property --tw-grayscale{syntax:"*";inherits:false}@property --tw-hue-rotate{syntax:"*";inherits:false}@property --tw-invert{syntax:"*";inherits:false}@property --tw-opacity{syntax:"*";inherits:false}@property --tw-saturate{syntax:"*";inherits:false}@property --tw-sepia{syntax:"*";inherits:false}@property --tw-drop-shadow{syntax:"*";inherits:false}@property --tw-drop-shadow-color{syntax:"*";inherits:false}@property --tw-drop-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-drop-shadow-size{syntax:"*";inherits:false}@property --tw-backdrop-blur{syntax:"*";inherits:false}@property --tw-backdrop-brightness{syntax:"*";inherits:false}@property --tw-backdrop-contrast{syntax:"*";inherits:false}@property --tw-backdrop-grayscale{syntax:"*";inherits:false}@property --tw-backdrop-hue-rotate{syntax:"*";inherits:false}@property --tw-backdrop-invert{syntax:"*";inherits:false}@property --tw-backdrop-opacity{syntax:"*";inherits:false}@property --tw-backdrop-saturate{syntax:"*";inherits:false}@property --tw-backdrop-sepia{syntax:"*";inherits:false}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-outline-style{syntax:"*";inherits:false;initial-value:solid}
@@ -922,8 +924,8 @@ ob_start();
 
 <body>
 
-<div class="page-wrapper antialiased font-sans text-slate-700 dark:text-slate-400 fixed inset-0" x-data='Navigation' @keydown.window.slash.prevent="$refs.search.focus();">
-    <header class="absolute top-0 h-14 lg:h-16 w-full flex items-center justify-between py-3 px-6 xl:px-8 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
+<div class="page-wrapper antialiased font-sans text-slate-700 dark:text-slate-400 fixed inset-0 overflow-y-auto scroll-pt-14 lg:scroll-pt-16 bg-white dark:bg-slate-950" x-data='Navigation' @keydown.window.slash.prevent="$refs.search.focus();">
+    <header class="sticky top-0 h-14 lg:h-16 flex items-center justify-between py-3 px-6 xl:px-8 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
         <div class="flex-1 md:flex items-center gap-3">
             <img class="h-6 md:h-10 dark:invert" src="data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -1 100 50'%3E%3Cpath d='m7.579 10.123 14.204 0c4.169 0.035 7.19 1.237 9.063 3.604 1.873 2.367 2.491 5.6 1.855 9.699-0.247 1.873-0.795 3.71-1.643 5.512-0.813 1.802-1.943 3.427-3.392 4.876-1.767 1.837-3.657 3.003-5.671 3.498-2.014 0.495-4.099 0.742-6.254 0.742l-6.36 0-2.014 10.07-7.367 0 7.579-38.001 0 0m6.201 6.042-3.18 15.9c0.212 0.035 0.424 0.053 0.636 0.053 0.247 0 0.495 0 0.742 0 3.392 0.035 6.219-0.3 8.48-1.007 2.261-0.742 3.781-3.321 4.558-7.738 0.636-3.71 0-5.848-1.908-6.413-1.873-0.565-4.222-0.83-7.049-0.795-0.424 0.035-0.83 0.053-1.219 0.053-0.353 0-0.724 0-1.113 0l0.053-0.053'/%3E%3Cpath d='m41.093 0 7.314 0-2.067 10.123 6.572 0c3.604 0.071 6.289 0.813 8.056 2.226 1.802 1.413 2.332 4.099 1.59 8.056l-3.551 17.649-7.42 0 3.392-16.854c0.353-1.767 0.247-3.021-0.318-3.763-0.565-0.742-1.784-1.113-3.657-1.113l-5.883-0.053-4.346 21.783-7.314 0 7.632-38.054 0 0'/%3E%3Cpath d='m70.412 10.123 14.204 0c4.169 0.035 7.19 1.237 9.063 3.604 1.873 2.367 2.491 5.6 1.855 9.699-0.247 1.873-0.795 3.71-1.643 5.512-0.813 1.802-1.943 3.427-3.392 4.876-1.767 1.837-3.657 3.003-5.671 3.498-2.014 0.495-4.099 0.742-6.254 0.742l-6.36 0-2.014 10.07-7.367 0 7.579-38.001 0 0m6.201 6.042-3.18 15.9c0.212 0.035 0.424 0.053 0.636 0.053 0.247 0 0.495 0 0.742 0 3.392 0.035 6.219-0.3 8.48-1.007 2.261-0.742 3.781-3.321 4.558-7.738 0.636-3.71 0-5.848-1.908-6.413-1.873-0.565-4.222-0.83-7.049-0.795-0.424 0.035-0.83 0.053-1.219 0.053-0.353 0-0.724 0-1.113 0l0.053-0.053'/%3E%3C/svg%3E%0A"/>
             <span class="hidden md:inline-block text-sm font-mono text-slate-400 dark:text-slate-500"><?php echo $info->version() ?></span>
@@ -937,6 +939,7 @@ ob_start();
             </div>
         </div>
         <div class="flex-1 flex justify-end items-center gap-3">
+            <!-- Dark mode toggle -->
             <button @click="darkMode = !darkMode; localStorage.setItem('phpinfo-dark', darkMode)" class="hidden md:flex items-center justify-center p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" title="Toggle dark mode">
                 <svg x-show="!darkMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
@@ -953,16 +956,18 @@ ob_start();
         </div>
     </header>
 
-    <div class="absolute w-full inset-0 overflow-y-auto pt-14 lg:pt-16 bg-white dark:bg-slate-950">
+    <div>
         <div x-cloak x-show="emptyState" class="max-w-3xl mx-auto mt-20 flex gap-4 justify-center text-slate-500 text-xl">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
+
             <div>No search results found</div>
         </div>
 
         <div class="flex-1 flex max-w-[96rem] mx-auto">
-            <div class="fixed top-14 lg:top-16 bottom-0 hidden md:block flex-shrink-0 w-48 lg:w-56 xl:w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <!-- Sidebar with fade indicators -->
+            <div class="fixed top-14 lg:top-16 bottom-0 hidden md:block w-48 lg:w-56 xl:w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 z-10">
                 <aside class="absolute inset-0 overflow-y-auto py-6 px-3 xl:px-4 space-y-0.5 scroll-py-6">
                     <template x-for="module in info.modules" :key="module.key">
                         <a x-show="module.shouldShow"
@@ -985,13 +990,23 @@ ob_start();
                                  x-show="module.shouldShow"
                                  class="md:space-y-3 lg:space-y-5 md:mb-6 lg:mb-10 md:scroll-mt-6" :id="module.key">
                             <h2 class="block text-lg font-semibold tracking-tight pl-6 md:pl-0 py-2 md:py-0 sticky md:relative top-0 border-b border-slate-100 dark:border-slate-800 md:border-0 z-20 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-                                <span x-text="module.name"></span>
+                                <a :href="'#' + module.key" @click="jump(module.key)" class="group inline-flex items-center gap-2">
+                                    <span x-text="module.name"></span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hidden group-hover:inline w-4 h-4 opacity-50">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                    </svg>
+                                </a>
                             </h2>
 
                             <template x-for="group in module.groups" :key="group.key">
                                 <div x-show="group.shouldShow" :id="group.key" class="md:scroll-mt-8">
                                     <h3 x-show="group.name" class="pl-6 md:pl-0 text-sm font-medium text-slate-500 dark:text-slate-400 my-3">
-                                        <span x-text="group.name"></span>
+                                        <a :href="'#' + group.key" class="group inline-flex items-center gap-2">
+                                            <span x-text="group.name"></span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hidden group-hover:inline w-4 h-4 opacity-50">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                            </svg>
+                                        </a>
                                     </h3>
                                     <div x-show="group.configs.length > 0"
                                          class="table-wrapper md:border border-slate-200 dark:border-slate-800 md:rounded-lg overflow-hidden">
@@ -1003,23 +1018,44 @@ ob_start();
                                                     <th x-show="group.headings.length == 3" class="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500 py-2.5 px-4"><span x-text="group.headings[2]"></span></th>
                                                 </tr>
                                             </thead>
+
                                             <tbody>
                                                 <template x-for="config in group.configs" :key="config.key">
                                                     <tr class="flex flex-col py-1.5 lg:py-0 lg:table-row border-b border-slate-100 dark:border-slate-800/75 last:border-0 lg:hover:bg-slate-50/75 lg:dark:hover:bg-slate-800/40 transition-colors"
-                                                        x-show="config.shouldShow">
+                                                        x-show="config.shouldShow"
+                                                        :class="hash == config.key && 'bg-blue-50 dark:bg-blue-950/30 lg:hover:bg-blue-50 lg:dark:hover:bg-blue-950/30'">
                                                         <td class="lg:w-1/4 flex-shrink-0 align-top py-1 lg:py-2.5 pl-6 lg:pl-4 font-medium text-slate-500 dark:text-slate-400">
-                                                            <span x-html="formatted(config.name)"></span>
+                                                            <a :id="config.key" :href="'#' + config.key"
+                                                               class="inline-flex items-center gap-2 group hover:text-slate-900 dark:hover:text-slate-200 scroll-mt-14 md:scroll-mt-8"
+                                                               :class="hash == config.key && 'dark:text-slate-200'"
+                                                            >
+                                                                <span x-html="formatted(config.name)"></span>
+
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hidden group-hover:inline w-3 h-3 opacity-50">
+                                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                                                </svg>
+                                                            </a>
                                                         </td>
-                                                        <td class="py-1 lg:py-2.5 px-6 lg:px-4 text-slate-600 dark:text-slate-300" style="overflow-wrap: anywhere"
+                                                        <td class="py-1 lg:py-2.5 px-6 lg:px-4 group/cell relative text-slate-600 dark:text-slate-300" style="overflow-wrap: anywhere"
                                                             :class="isNoValue(config.localValue) && 'text-slate-300 dark:text-slate-600 italic'">
                                                             <span x-show="group.headings.length > 0" class="empty:hidden inline-block w-14 text-center lg:hidden py-0.5 mr-1 text-xs font-medium rounded border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400" x-text="group.shortHeadings[1]"></span>
                                                             <span x-html="isLongValue(config.localValue) && !config.expanded ? truncateValue(formatted(config.localValue)) : formatted(config.localValue)"></span>
                                                             <button x-show="isLongValue(config.localValue)" @click="config.expanded = !config.expanded" class="ml-1 text-xs text-blue-600 dark:text-blue-400 hover:underline" x-text="config.expanded ? 'show less' : 'show more'"></button>
+                                                            <button x-show="!isNoValue(config.localValue)" @click="copyValue(config.localValue)" class="copy-btn hidden lg:group-hover/cell:inline-flex absolute top-2 right-2 items-center justify-center p-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-xs" title="Copy value">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                                                </svg>
+                                                            </button>
                                                         </td>
-                                                        <td x-show="config.hasMasterValue" class="py-1 lg:py-2.5 px-6 lg:px-4 text-slate-600 dark:text-slate-300" style="overflow-wrap: anywhere"
+                                                        <td x-show="config.hasMasterValue" class="py-1 lg:py-2.5 px-6 lg:px-4 group/cell relative text-slate-600 dark:text-slate-300" style="overflow-wrap: anywhere"
                                                             :class="isNoValue(config.masterValue) && 'text-slate-300 dark:text-slate-600 italic'">
                                                             <span x-show="group.headings.length > 0" class="empty:hidden inline-block w-14 text-center lg:hidden py-0.5 mr-1 text-xs font-medium rounded border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400" x-text="group.shortHeadings[2]"></span>
                                                             <span x-html="formatted(config.masterValue)"></span>
+                                                            <button x-show="!isNoValue(config.masterValue)" @click="copyValue(config.masterValue)" class="copy-btn hidden lg:group-hover/cell:inline-flex absolute top-2 right-2 items-center justify-center p-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-xs" title="Copy value">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                                                </svg>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 </template>
@@ -1038,7 +1074,7 @@ ob_start();
     </div>
 
     <div x-cloak x-transition.opacity x-show="mobileNav" class="absolute inset-0 overflow-hidden bg-slate-900/50 backdrop-blur-sm z-40">
-        <div x-show="mobileNav" @click.away="hideMobileNav()" class="fixed top-0 bottom-0 right-0 w-80 bg-slate-800 dark:bg-slate-700 z-50">
+        <div x-show="mobileNav" @click.away="hideMobileNav()" class="fixed top-0 bottom-0 right-0 w-80 bg-slate-800 dark:bg-slate-700 z-50 ">
             <nav class="absolute inset-0 overflow-y-auto p-6 pt-16 space-y-px text-white">
                 <template x-for="module in info.modules" :key="module.key">
                     <a x-show="module.shouldShow"
@@ -1050,6 +1086,7 @@ ob_start();
                        x-text="module.name"></a>
                 </template>
             </nav>
+
             <div class="absolute top-0 left-0 right-0 flex justify-end bg-gradient-to-b from-slate-800 dark:from-slate-700 via-slate-800/75 dark:via-slate-700/75 to-transparent">
                 <button @click="hideMobileNav()" class="mt-3 mr-4 p-2 bg-slate-800 dark:bg-slate-700 text-slate-400 border border-slate-600 rounded">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -1059,6 +1096,11 @@ ob_start();
             </div>
         </div>
     </div>
+
+    <!-- Copy toast -->
+    <div x-cloak x-show="copyToast" x-transition.opacity class="fixed bottom-6 right-6 z-50 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-medium px-3 py-2 rounded-md">
+        Copied to clipboard
+    </div>
 </div>
 
 <script>
@@ -1067,13 +1109,14 @@ ob_start();
             hash: null,
             mobileNav: false,
             info: <?php echo json_encode($info) ?>,
-            sections: <?php echo json_encode($info->modules()->map(fn($m) => $m->key())->all()) ?>,
+            sections: <?php echo json_encode($info->modules()->map(fn($m) => $m->key())->values()) ?>,
             selected: null,
             selectedIndex: null,
             initialized: false,
             search: null,
             searchFocused: false,
             emptyState: false,
+            copyToast: false,
             init() {
                 if(window.location.hash != '') this.hash = window.location.hash.replace("#","");
                 window.addEventListener('hashchange', () => this.hash = window.location.hash.replace("#",""), false);
@@ -1086,12 +1129,12 @@ ob_start();
                         this.selectModule(this.firstSectionVisible());
                     }
 
-                    let nav = document.querySelector(`#nav_${this.selected}`);
-                    if(nav) nav.scrollIntoView({block: "center"});
+                    document.querySelector(`#nav_${this.selected}`).scrollIntoView({block: "center"});
                     this.initialized = true;
                 });
 
                 this.allVisible();
+
                 this.$watch('search', () => this.isFiltered() ? this.applyVisibleFlags() : this.allVisible());
             },
             allVisible() {
@@ -1100,14 +1143,17 @@ ob_start();
                         group.configs.forEach((config) => config.shouldShow = true);
                         group.shouldShow = true;
                     });
+
                     module.shouldShow = true;
                 });
                 this.emptyState = false;
             },
             applyVisibleFlags() {
                 let term = this.search.toLowerCase();
+
                 this.info.modules.forEach((module) => {
                     let moduleNameMatch = module.name.toLowerCase().includes(term);
+
                     module.groups.forEach((group) => {
                         group.configs.forEach((config) => {
                             config.shouldShow = moduleNameMatch
@@ -1115,51 +1161,89 @@ ob_start();
                                 || (config.localValue && config.localValue.toLowerCase().includes(term))
                                 || (config.hasMasterValue && config.masterValue && config.masterValue.toLowerCase().includes(term));
                         });
+
                         group.shouldShow = moduleNameMatch
                             ? group.configs.length > 0
                             : group.configs.filter((config) => config.shouldShow).length > 0;
                     });
+
                     module.shouldShow = moduleNameMatch || module.groups.filter((group) => group.shouldShow).length > 0;
                 });
+
                 this.emptyState = this.info.modules.filter((module) => module.shouldShow).length === 0;
             },
-            isFiltered() { return !this.isUnfiltered(); },
-            isUnfiltered() { return this.search == null || this.search == ''; },
-            isNoValue(val) { return val == null || val === 'no value'; },
-            isLongValue(val) { return val && val.length > 200; },
+            isFiltered() {
+                return !this.isUnfiltered();
+            },
+            isUnfiltered() {
+                return this.search == null || this.search == '';
+            },
+            isNoValue(val) {
+                return val == null || val === 'no value';
+            },
+            isLongValue(val) {
+                return val && val.length > 200;
+            },
             truncateValue(html) {
                 if(!html) return html;
                 let text = html.replace(/<[^>]+>/g, '');
                 if(text.length <= 200) return html;
                 return html.substring(0, 200) + '...';
             },
+            copyValue(val) {
+                if(!val || val === 'no value') return;
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(val);
+                } else {
+                    let ta = document.createElement('textarea');
+                    ta.value = val;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+                this.copyToast = true;
+                setTimeout(() => this.copyToast = false, 1500);
+            },
             firstSectionVisible() {
-                let first = Array.from(document.querySelectorAll('section')).filter((s) =>
-                    s && s.getBoundingClientRect().bottom > 100
+                let first = Array.from(document.querySelectorAll('section')).filter((section) =>
+                    section && section.getBoundingClientRect().bottom > 100
                 )[0];
+
                 return first ? first.id : null;
             },
             enter(key) {
                 let index = this.sections.indexOf(key);
+
                 if (this.initialized && (this.selectedIndex == null || index < this.selectedIndex || this.selectedNoLongerVisible())) {
                     this.select(index);
                 }
             },
             leave(key) {
+                let index = this.sections.indexOf(key);
+
                 if (this.initialized && (this.selectedIndex == null || this.selectedIndex == this.sections.indexOf(key) || this.selectedNoLongerVisible())) {
                     this.selectNextIndex();
                 }
             },
-            jump(key) { this.selectModule(key); },
-            isModule(key) { return this.sections.indexOf(key) > -1; },
+            jump(key) {
+                this.selectModule(key);
+            },
+            isModule(key) {
+                return this.sections.indexOf(key) > -1;
+            },
             select(index) {
                 if(this.sections[index] === undefined) return;
+
                 this.selectedIndex = index;
                 this.selected = this.sections[index];
                 this.scrollIntoView();
             },
             selectNextIndex() {
                 if(this.isUnfiltered()) return this.select(this.selectedIndex + 1);
+
                 this.selectModule(this.firstSectionVisible());
             },
             selectModule(key) {
@@ -1167,27 +1251,36 @@ ob_start();
             },
             selectedNoLongerVisible() {
                 let el = document.querySelector("#" + this.selected);
+
                 return el == null || el.getBoundingClientRect().bottom < 100;
             },
             scrollIntoView() {
                 let el = document.querySelector(`#nav_${this.selected}`);
+
                 if(el) el.scrollIntoView({block: "nearest"});
             },
             showMobileNav() {
                 document.body.style = "overflow-y: hidden";
                 this.mobileNav = true;
-                this.$nextTick(() => { let el = document.querySelector(`#mobile_nav_${this.selected}`); if(el) el.scrollIntoView({block: "center"}); });
+                this.$nextTick(() => document.querySelector(`#mobile_nav_${this.selected}`).scrollIntoView({block: "center"}));
             },
             hideMobileNav() {
                 document.body.style = "";
                 this.mobileNav = false;
             },
-            escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); },
+            escapeRegex(str) {
+                return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            },
             formatted(text) {
                 if(text) text = text.replaceAll("\n", "<br>");
+
                 if(this.isUnfiltered() || text == null) return text;
-                try { return text.replace(new RegExp(this.escapeRegex(this.search),"gi"), "<mark>$&</mark>"); }
-                catch(e) { return text; }
+
+                try {
+                    return text.replace(new RegExp(this.escapeRegex(this.search),"gi"), "<mark>$&</mark>");
+                } catch(e) {
+                    return text;
+                }
             }
         }))
     });
@@ -1205,6 +1298,7 @@ ${r?'Expression: "'+r+`"
 </script>
 </body>
 </html>
+
 <?php
 $html = ob_get_clean();
 
