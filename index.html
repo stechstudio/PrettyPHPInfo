@@ -160,9 +160,9 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
-                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0">
+                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0 flex flex-col">
                     <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-slate-500">Check modules and configs</div>
-                    <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                    <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed flex-1">
                         <div><span class="variable">$info</span> = <span class="class">Info</span><span class="operator">::</span><span class="function">capture</span>();</div>
                         <div class="mt-3"><span class="comment">// Check for extensions</span></div>
                         <div><span class="variable">$info</span><span class="operator">-></span><span class="function">hasModule</span>(<span class="string">'redis'</span>); <span class="comment">// true</span></div>
@@ -177,9 +177,9 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0">
+                <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0 flex flex-col">
                     <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-slate-500">Iterate and explore</div>
-                    <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                    <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed flex-1">
                         <div><span class="comment">// Iterate all modules</span></div>
                         <div><span class="variable">$info</span><span class="operator">-></span><span class="function">modules</span>()<span class="operator">-></span><span class="function">each</span>(<span class="keyword">function</span>(<span class="variable">$module</span>) {</div>
                         <div>&nbsp;&nbsp;<span class="variable">$module</span><span class="operator">-></span><span class="function">name</span>();</div>
