@@ -230,6 +230,56 @@
         </div>
     </section>
 
+    <!-- Why not ini_get? -->
+    <section class="px-4 sm:px-6 pb-16 sm:pb-24">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-8 sm:gap-12 items-start">
+                <!-- Left: problem statement -->
+                <div>
+                    <div class="text-xs font-medium uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-2 sm:mb-3">Why a package?</div>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4 sm:mb-6">Can't I just use <code class="font-mono text-[0.85em]">ini_get()</code>?</h2>
+                    <div class="space-y-4 text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed">
+                        <p>PHP configuration is scattered across a handful of narrow functions. <code class="text-slate-700 dark:text-slate-300 text-[0.85em]">ini_get()</code> returns one value at a time. <code class="text-slate-700 dark:text-slate-300 text-[0.85em]">extension_loaded()</code> gives you a boolean. <code class="text-slate-700 dark:text-slate-300 text-[0.85em]">phpversion()</code> and <code class="text-slate-700 dark:text-slate-300 text-[0.85em]">php_uname()</code> each return a single string.</p>
+                        <p>Every one of these requires you to know exactly what you're looking for. There's no way to discover, iterate, or search.</p>
+                        <p>And even combined, they can't give you everything. Compile options, Zend extension internals, stream wrappers, registered filters, and per-extension metadata are only available through <code class="text-slate-700 dark:text-slate-300 text-[0.85em]">phpinfo()</code>.</p>
+                        <p class="text-slate-700 dark:text-slate-300"><code class="text-[0.85em]">phpinfo()</code> is the only function with the complete picture. This package makes that data actually usable.</p>
+                    </div>
+                </div>
+
+                <!-- Right: comparison -->
+                <div class="space-y-4 sm:space-y-5">
+                    <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden">
+                        <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-slate-400">Without this package</div>
+                        <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                            <div><span class="function">ini_get</span>(<span class="string">'memory_limit'</span>);     <span class="comment">// local value only</span></div>
+                            <div><span class="function">extension_loaded</span>(<span class="string">'redis'</span>);  <span class="comment">// just true/false</span></div>
+                            <div><span class="function">get_loaded_extensions</span>();    <span class="comment">// names, no config</span></div>
+                            <div><span class="function">phpversion</span>();               <span class="comment">// just the version</span></div>
+                            <div><span class="function">php_uname</span>();                <span class="comment">// just the OS</span></div>
+                            <div class="mt-2"><span class="comment">// compile flags? stream wrappers?</span></div>
+                            <div><span class="comment">// master vs local values?</span></div>
+                            <div><span class="comment">// iterate all config? ...nope.</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden ring-1 ring-indigo-500/20 dark:ring-indigo-400/10">
+                        <div class="px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-white/5 text-xs font-medium text-indigo-600 dark:text-indigo-400">With Pretty PHP Info</div>
+                        <div class="code-block p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed">
+                            <div><span class="variable">$info</span> = <span class="class">Info</span><span class="operator">::</span><span class="function">capture</span>();</div>
+                            <div class="mt-2"><span class="variable">$info</span><span class="operator">-></span><span class="function">config</span>(<span class="string">'memory_limit'</span>);            <span class="comment">// local</span></div>
+                            <div><span class="variable">$info</span><span class="operator">-></span><span class="function">config</span>(<span class="string">'memory_limit'</span>, <span class="string">'master'</span>); <span class="comment">// master</span></div>
+                            <div><span class="variable">$info</span><span class="operator">-></span><span class="function">hasModule</span>(<span class="string">'redis'</span>);              <span class="comment">// check</span></div>
+                            <div><span class="variable">$info</span><span class="operator">-></span><span class="function">module</span>(<span class="string">'redis'</span>)<span class="operator">-></span><span class="function">configs</span>();      <span class="comment">// full detail</span></div>
+                            <div class="mt-2"><span class="comment">// iterate everything, discover anything</span></div>
+                            <div><span class="variable">$info</span><span class="operator">-></span><span class="function">modules</span>()<span class="operator">-></span><span class="function">each</span>(<span class="keyword">fn</span>(<span class="variable">$m</span>) <span class="operator">=></span> ...);</div>
+                            <div><span class="variable">$info</span><span class="operator">-></span><span class="function">configs</span>()<span class="operator">-></span><span class="function">filter</span>(<span class="keyword">fn</span>(<span class="variable">$c</span>) <span class="operator">=></span> ...);</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA -->
     <section class="px-4 sm:px-6 pb-20 sm:pb-32">
         <div class="max-w-2xl mx-auto text-center">
